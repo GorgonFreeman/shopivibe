@@ -15,6 +15,12 @@
   "type": "commonjs",
   "main": "theme.liquid",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "w": "shopify theme dev --path ./src",
+    "down": "shopify theme pull --path ./src",
+    "up": "shopify theme push --path ./src"
+  },
+  "devDependencies": {
+    "@shopify/cli": "^3.78.0"
   }
 }

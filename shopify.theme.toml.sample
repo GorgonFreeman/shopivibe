@@ -1,0 +1,5 @@
+[environments.default]
+path = "./src"
+# store = "your-store"       # your-store.myshopify.com
+# theme = "123456789012"     # theme ID, or omit to be prompted
+# password = "shptka_xxx"    # Theme Access app password, if needed
