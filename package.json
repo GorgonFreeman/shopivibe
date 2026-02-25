@@ -1,0 +1,20 @@
+{
+  "name": "shopivibe",
+  "version": "0.0.1",
+  "description": "My ideal Shopify theme...but vibe-coded",
+  "homepage": "https://github.com/GorgonFreeman/shopivibe#readme",
+  "bugs": {
+    "url": "https://github.com/GorgonFreeman/shopivibe/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://GorgonFreeman@github.com/GorgonFreeman/shopivibe.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "theme.liquid",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
