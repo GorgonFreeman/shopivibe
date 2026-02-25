@@ -1,4 +1,5 @@
-{{ shop | json }}
+{ "name": {{- shop.name | json -}}, "currency": {{- shop.currency | json -}} }
+
 {% schema %}
 {
   "name": "Index",
