@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "html",
+      "settings": {
+        "content": "<div>404</div>"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
