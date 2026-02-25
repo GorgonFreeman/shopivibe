@@ -16,7 +16,7 @@
   "main": "theme.liquid",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "w": "shopify theme dev --path ./src",
+    "w": "shopify theme dev --path ./src --live-reload hot-reload --open",
     "down": "shopify theme pull --path ./src",
     "up": "shopify theme push --path ./src"
   },
