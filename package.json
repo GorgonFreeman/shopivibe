@@ -16,11 +16,16 @@
   "main": "theme.liquid",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node scripts/build.js",
+    "watch": "node scripts/watch.js",
     "w": "shopify theme dev --path ./src --live-reload hot-reload --open",
     "down": "shopify theme pull --path ./src",
     "up": "shopify theme push --path ./src"
   },
   "devDependencies": {
-    "@shopify/cli": "^3.78.0"
+    "@shopify/cli": "^3.78.0",
+    "chokidar": "^4.0.1",
+    "concurrently": "^9.1.0",
+    "js-yaml": "^4.1.0"
   }
 }

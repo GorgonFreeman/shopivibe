@@ -1,1 +1,3 @@
-/.creds.yml
+node_modules/
+dist/
+.creds.yml
