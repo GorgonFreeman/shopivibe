@@ -1,0 +1,10 @@
+shopify:
+  au:
+    STORE_URL: store-a
+    SHOPIFY_API_KEY: shpat_____________
+  us:
+    STORE_URL: store-b
+    SHOPIFY_API_KEY: shpat_____________
+  uk:
+    STORE_URL: store-c
+    SHOPIFY_API_KEY: shpat_____________
