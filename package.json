@@ -18,7 +18,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node scripts/build.js",
     "w": "node scripts/watch.js",
-    "down": "shopify theme pull --path ./src",
+    "down": "node scripts/down.js",
     "up": "shopify theme push --path ./src"
   },
   "devDependencies": {
