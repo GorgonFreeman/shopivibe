@@ -1,9 +1,0 @@
-{
-  "sections": {
-    "main": {
-      "type": "gift_card",
-      "settings": {}
-    }
-  },
-  "order": ["main"]
-}
