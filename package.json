@@ -17,8 +17,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node scripts/build.js",
-    "watch": "node scripts/watch.js",
-    "w": "shopify theme dev --path ./src --live-reload hot-reload --open",
+    "w": "node scripts/watch.js",
     "down": "shopify theme pull --path ./src",
     "up": "shopify theme push --path ./src"
   },
