@@ -149,8 +149,7 @@ function getThemeDevCommand(storeId, distDir, port) {
   const creds = loadStoreCreds(storeId);
   const storeUrl = creds.STORE_URL || storeId;
   const envPrefix = creds.SHOPIFY_API_KEY ? `SHOPIFY_API_KEY=${ creds.SHOPIFY_API_KEY } ` : '';
-  const cmd = `${ envPrefix }shopify theme dev --path ${ distDir } --store ${ storeUrl } --port ${ port } --live-reload hot-reload`;
-  return cmd;
+  return `${ envPrefix }shopify theme dev --path ${ distDir } --store ${ storeUrl } --port ${ port } --live-reload hot-reload`;
 }
 
 function getWatchPaths(stores) {
@@ -198,22 +197,42 @@ async function main() {
     console.log('[watch] Watching:', watchPaths.join(', '));
   });
 
+  const projectRoot = path.join(__dirname, '..');
   const basePort = 9292;
-  const concurrentArgs = ['-n', stores.join(','), '-c', 'cyan,magenta,green'];
-  stores.forEach((storeId, i) => {
-    const distDir = path.join(__dirname, '..', 'dist', storeId);
-    const port = basePort + i;
-    concurrentArgs.push(getThemeDevCommand(storeId, distDir, port));
-  });
+  const isMac = process.platform === 'darwin';
 
-  console.log('\nStarting theme dev for', stores.join(', '), '...\n');
-  const concurrent = spawn('npx', ['concurrently', ...concurrentArgs], {
-    stdio: 'inherit',
-    cwd: path.join(__dirname, '..'),
-  });
+  if (isMac) {
+    console.log('\nOpening theme dev for', stores.join(', '), 'in separate tabs...\n');
+    stores.forEach((storeId, i) => {
+      const distDir = path.join(projectRoot, 'dist', storeId);
+      const port = basePort + i;
+      const cmd = getThemeDevCommand(storeId, distDir, port);
+      spawn('npx', ['ttab', '-t', `shopivibe ${ storeId }`, '-d', projectRoot, cmd], {
+        stdio: 'inherit',
+        cwd: projectRoot,
+      });
+    });
+    console.log('File watcher running in this tab. Theme dev processes are in the new tabs.');
+  } else {
+    const concurrentArgs = ['-n', stores.join(','), '-c', 'cyan,magenta,green'];
+    stores.forEach((storeId, i) => {
+      const distDir = path.join(projectRoot, 'dist', storeId);
+      const port = basePort + i;
+      concurrentArgs.push(getThemeDevCommand(storeId, distDir, port));
+    });
+    console.log('\nStarting theme dev for', stores.join(', '), '(interactivity may be limited in one window)...\n');
+    const concurrent = spawn('npx', ['concurrently', ...concurrentArgs], {
+      stdio: 'inherit',
+      cwd: projectRoot,
+    });
+    process.on('SIGINT', () => {
+      concurrent.kill('SIGINT');
+      watcher.close();
+      process.exit(0);
+    });
+  }
 
   process.on('SIGINT', () => {
-    concurrent.kill('SIGINT');
     watcher.close();
     process.exit(0);
   });
