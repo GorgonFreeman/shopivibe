@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
+const chalk = require('chalk');
+
 const SRC_DIR = path.join(__dirname, '..', 'src');
 const REGIONAL_DIR = path.join(__dirname, '..', 'regional');
 const CREDS_PATH = path.join(__dirname, '..', '.creds.yml');
@@ -24,10 +26,80 @@ function loadCreds() {
 }
 
 function promptStores(availableStores) {
-  return new Promise((resolve) => {
+  if (!process.stdin.isTTY) {
+    return promptStoresFallback(availableStores);
+  }
+  return new Promise((resolve, reject) => {
+    const selected = new Set();
+    let resolving = false;
+
+    function render() {
+      process.stdout.write('\x1b[2J\x1b[H');
+      console.log('\nSelect stores (press number to toggle, Enter to confirm):\n');
+      availableStores.forEach((store, i) => {
+        const num = String(i + 1);
+        const line = `  [${ num }] ${ store }`;
+        const styled = selected.has(store) ? chalk.cyan(line) : line;
+        console.log(styled);
+      });
+      console.log('\n  Selected:', selected.size ? Array.from(selected).join(', ') : '(none)');
+    }
+
+    function cleanup() {
+      process.stdin.setRawMode(false);
+      process.stdin.pause();
+      process.stdin.removeAllListeners('keypress');
+    }
+
+    function finish() {
+      if (resolving) return;
+      resolving = true;
+      cleanup();
+      const result = Array.from(selected);
+      if (result.length === 0) {
+        console.error('\nNo stores selected. Select at least one.');
+        reject(new Error('No stores selected'));
+      } else {
+        resolve(result);
+      }
+    }
+
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+    process.stdin.setEncoding('utf8');
+    readline.emitKeypressEvents(process.stdin);
+
+    process.stdin.on('keypress', (str, key) => {
+      if (!key) return;
+      if (key.name === 'return' || key.name === 'enter') {
+        finish();
+        return;
+      }
+      if (key.ctrl && key.name === 'c') {
+        cleanup();
+        process.exit(130);
+      }
+      const n = parseInt(str, 10);
+      if (n >= 1 && n <= availableStores.length) {
+        const store = availableStores[n - 1];
+        if (selected.has(store)) {
+          selected.delete(store);
+        } else {
+          selected.add(store);
+        }
+        render();
+      }
+    });
+
+    render();
+  });
+}
+
+function promptStoresFallback(availableStores) {
+  return new Promise((resolve, reject) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     console.log('\nAvailable stores:', availableStores.join(', '));
-    console.log('Enter store IDs to include (comma-separated, e.g. au,us,uk):');
+    console.log('Enter store IDs (comma-separated, e.g. au,us,uk):');
     rl.question('> ', (answer) => {
       rl.close();
       const selected = answer
@@ -35,10 +107,10 @@ function promptStores(availableStores) {
         .map((s) => s.trim().toLowerCase())
         .filter((s) => s && availableStores.includes(s));
       if (selected.length === 0) {
-        console.error('No valid stores selected. Use: ' + availableStores.join(', '));
-        process.exit(1);
+        reject(new Error('No valid stores selected. Use: ' + availableStores.join(', ')));
+      } else {
+        resolve(selected);
       }
-      resolve(selected);
     });
   });
 }
