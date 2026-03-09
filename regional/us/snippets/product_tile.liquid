@@ -1,0 +1,115 @@
+{% liquid 
+  assign image_main = product.featured_image
+  assign image_alt = product.images[1]
+
+  assign has_alt_image = false 
+  if image_alt != blank
+    assign has_alt_image = true 
+  endif 
+
+  if wishlist == false
+    assign show_wishlist = false
+  else
+    assign show_wishlist = true
+  endif
+%}
+
+<div class="product-item {{ classes }} {% if has_alt_image %}_has_alt_image{% endif %}" data-evg-item-id="{{ product.id }}" data-evg-item-type="Product" data-product-name="{{ product.title | escape }}">
+  <div class="product-item__image">
+
+    {% if quick_add != false %}
+      {% render 'product_tile_quick_add', product: product %}
+     {% endif %}
+
+    {% if quick_add_cart == true %}
+      {% render 'product_tile_quick_add_sidecart', product: product %}
+    {% endif  %}
+
+
+    <a href="{{ product.url }}" 
+      {% comment %}
+      style="background-image: url({{ image_main | img_url: '4x' | format: 'jpg' }});"
+      {% endcomment %}
+      style="background-image: url({{ image_main | img_url: '1x' | format: 'jpg' }});"
+      data-sf-custom-event data-stat="Clickthrough"
+    >    
+      {%- if image_main != blank -%}
+        {%- render 'lazy-image', image_object: image_main, classes: 'w-100 fade-in image_main', base_size: '50x', remove_src: true -%}
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg placeholder-svg--portrait' }}
+      {%- endif -%}
+      {%- if has_alt_image -%}
+        {%- render 'lazy-image', image_object: image_alt, classes: 'w-100 fade-in image_alt', base_size: '50x', remove_src: true -%}
+      {%- endif -%}
+       
+    </a>
+
+  </div>
+
+  <div class="product-item__name-wrapper {% if show_wishlist == true %}_has_wishlist{% endif %}">
+    <a href="{{ product.url }}" class="product-item__name product-name">{{ product.title }}</a>
+    {% if show_wishlist == true %}
+      <wishlist-button product-image="{{ product.featured_image.src | image_url: width: 50 }}" product-id="{{ product.id }}" product-title="{{ product.title | escape }}" product-category="{{ product.category }}"></wishlist-button>
+    {% endif %}
+  </div>
+  <div class="product-item__price">
+    <span>
+    {% if settings.storewide_discount_enable and product.tags contains 'discountable' %}
+      {% assign discount = 100 | minus: settings.storewide_discount_amount | times: 0.01 %}
+      {% assign discounted_price = product.price | times: discount | ceil | money_without_currency %}
+      {%- if product.compare_at_price -%}
+        <span><s>{{ product.compare_at_price | money }}</s></span>
+        {% assign percent = product.price | times: discount | times: 1.0 | divided_by: product.compare_at_price | times: 100 | round %}
+      {% else %}
+        <span><s>{{ product.price | money }}</s></span>
+        {% assign percent = discount | times: 100 | round %}
+      {% endif %}
+      <span class="text-danger ml-2">{{cart.currency.symbol}}{{ discounted_price }} {{ cart.currency.iso_code }}</span>
+      <p>{{ 100 | minus: percent }}% OFF</p>
+    {% else %}
+
+    {%- if product.compare_at_price > product.price -%}
+      <span class="sr-only">{{ 'products.product.regular_price' | t }}</span>
+      <span><s>{{ product.compare_at_price | money }}</s></span>
+    {%- endif -%}
+
+
+    {%- if product.compare_at_price > product.price -%}
+      <span class="text-danger ml-2">
+      
+          {%- if product.price_varies -%}
+            {%- assign sale_price = product.price | money -%}
+            {{ 'products.product.on_sale_from_html' | t: price: sale_price }}
+          {%- else -%}
+            {{ product.price | money }}
+          {%- endif -%}
+
+          {{ cart.currency.iso_code }}
+      
+      </span>
+      {% assign percent = product.price | times: 1.0 | divided_by: product.compare_at_price | times: 100 | round %}
+      <p>{{ 100 | minus: percent }}% OFF</p>
+
+    {%- else -%}
+
+      {%- if product.price_varies -%}
+        {%- assign price = product.price | money -%}
+        {{ 'products.product.from_text_html' | t: price: price }}
+      {%- else -%}
+        {{ product.price | money }}
+      {%- endif -%}
+
+      {{ cart.currency.iso_code }}
+
+    {%- endif -%}
+    {% endif %}
+
+
+    {%- unless product.available -%}
+      <span>{{ 'products.product.sold_out' | t }}</span>
+    {%- endunless -%}
+    </span>
+
+    
+  </div>
+</div>
