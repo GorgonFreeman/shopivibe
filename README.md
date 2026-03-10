@@ -23,7 +23,9 @@ e.g. if you run `npm run watch`, you are asked which stores you want to develop 
 
 **Commands:** `watch` (dev + file watcher), `download` (pull from Shopify, same as down), `upload` (select theme per store, push over it), `deploy` (create new theme per store with given name).
 
-Any terminal processes will be done in their own tabs so that you can answer questions. 
+Any terminal processes will be done in their own tabs so that you can answer questions.
+
+**Theme dev:** Use `npm run watch` so the build runs first. If running `shopify theme dev` manually, run `STORES=au npm run build` first. 
 
 ## Vite build process
 

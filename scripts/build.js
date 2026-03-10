@@ -9,12 +9,7 @@ const REGIONAL_DIR = path.join(__dirname, '..', 'regional');
 const DIST_BASE = path.join(__dirname, '..', 'dist');
 const PROJECT_ROOT = path.join(__dirname, '..');
 const BUILD_ASSETS = path.join(PROJECT_ROOT, 'build', 'assets');
-
-function clearDist() {
-  if (fs.existsSync(DIST_BASE)) {
-    fs.rmSync(DIST_BASE, { recursive: true });
-  }
-}
+const DIST_STAGING = path.join(PROJECT_ROOT, 'build', 'dist-staging');
 
 function runViteBuild() {
   const result = spawnSync('npx', [ 'vite', 'build' ], {
@@ -38,6 +33,7 @@ function copyRecursive(src, dest, excludeDir) {
       copyRecursive(srcPath, destPath, excludeDir);
     }
   } else {
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.copyFileSync(src, dest);
   }
 }
@@ -60,25 +56,24 @@ function mergeIntoDest(srcDir, destDir) {
   }
 }
 
-function buildStore(storeId) {
-  const distDir = path.join(DIST_BASE, storeId);
-  fs.mkdirSync(distDir, { recursive: true });
-  copyRecursive(SRC_DIR, distDir);
+function buildStore(storeId, outBase) {
+  const outDir = path.join(outBase, storeId);
+  fs.mkdirSync(outDir, { recursive: true });
+  copyRecursive(SRC_DIR, outDir);
   const buildAssetsDir = path.join(BUILD_ASSETS, 'assets');
-  const distAssets = path.join(distDir, 'assets');
-  fs.mkdirSync(distAssets, { recursive: true });
+  const outAssets = path.join(outDir, 'assets');
+  fs.mkdirSync(outAssets, { recursive: true });
   if (fs.existsSync(buildAssetsDir)) {
-    mergeIntoDest(buildAssetsDir, distAssets);
+    mergeIntoDest(buildAssetsDir, outAssets);
   }
   const regionalStoreDir = path.join(REGIONAL_DIR, storeId);
   if (fs.existsSync(regionalStoreDir)) {
-    mergeIntoDest(regionalStoreDir, distDir);
+    mergeIntoDest(regionalStoreDir, outDir);
   }
-  return distDir;
+  return outDir;
 }
 
 function build(stores) {
-  clearDist();
   runViteBuild();
   const viteBuildResult = spawnSync('node', [ path.join(__dirname, 'vite-build.js') ], {
     cwd: PROJECT_ROOT,
@@ -87,10 +82,21 @@ function build(stores) {
   if (viteBuildResult.status !== 0) {
     process.exit(viteBuildResult.status);
   }
+  fs.mkdirSync(DIST_STAGING, { recursive: true });
   for (const storeId of stores) {
-    const distDir = buildStore(storeId);
+    buildStore(storeId, DIST_STAGING);
     console.log(`Built dist/${ storeId }`);
   }
+  fs.mkdirSync(DIST_BASE, { recursive: true });
+  for (const storeId of stores) {
+    const stagingDir = path.join(DIST_STAGING, storeId);
+    const distDir = path.join(DIST_BASE, storeId);
+    const oldDir = path.join(DIST_BASE, `${ storeId }.old`);
+    if (fs.existsSync(distDir)) fs.renameSync(distDir, oldDir);
+    fs.renameSync(stagingDir, distDir);
+    if (fs.existsSync(oldDir)) fs.rmSync(oldDir, { recursive: true });
+  }
+  if (fs.existsSync(DIST_STAGING)) fs.rmSync(DIST_STAGING, { recursive: true });
 }
 
 let stores = process.argv.slice(2);
