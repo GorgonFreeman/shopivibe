@@ -46,12 +46,15 @@ function generateJsTranslations(distDir) {
   if (!fs.existsSync(localesDir)) return;
 
   const translations = {};
+  let defaultLocale = null;
   for (const file of fs.readdirSync(localesDir)) {
     if (!file.endsWith('.json')) continue;
+    const isDefault = file.endsWith('.default.json');
     const locale = file.replace(/\.default\.json$|\.json$/i, '');
     const content = fs.readFileSync(path.join(localesDir, file), 'utf8');
     try {
       translations[locale] = JSON.parse(content);
+      if (isDefault) defaultLocale = locale;
     } catch {
       // Skip invalid JSON
     }
@@ -59,13 +62,23 @@ function generateJsTranslations(distDir) {
 
   if (Object.keys(translations).length === 0) return;
 
+  const caseBranches = Object.entries(translations)
+    .map(([ locale, data ]) => `  {% when ${ JSON.stringify(locale) } %}\n  ${ JSON.stringify(data) }`)
+    .join('\n');
+
+  const defaultData = defaultLocale ? JSON.stringify(translations[defaultLocale]) : '{}';
+
   const snippet = `{% comment %}
-  Auto-generated: all locale translations for use in scripts.
+  Auto-generated: current locale translations for use in scripts.
   Include once in layout: {% render 'js_translations' %}
 {% endcomment %}
 <script>
-  window.__translations = ${ JSON.stringify(translations) };
-  window.__locale = {{ request.locale.iso_code | json }};
+  window.shopivibe = window.shopivibe || {};
+  window.shopivibe.translations = {% case request.locale.iso_code %}
+${ caseBranches }
+  {% else %}
+  ${ defaultData }
+  {% endcase %};
 </script>
 `;
 
