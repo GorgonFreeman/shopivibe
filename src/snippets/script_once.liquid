@@ -1,0 +1,11 @@
+{% comment %}
+  Load a script once per page. Use in snippets/sections that need paired JS.
+  e.g. {% render 'script_once', name: 'snippets_productTile' %}
+  Pairs with src/scripts/snippets_productTile.js
+{% endcomment %}
+{% assign __key = ',' | append: name | append: ',' %}
+{% assign __script_keys = __script_keys | default: ',' %}
+{% unless __script_keys contains __key %}
+  <script src="{{ name | append: '.js' | asset_url }}" defer></script>
+  {% assign __script_keys = __script_keys | append: name | append: ',' %}
+{% endunless %}
