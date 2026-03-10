@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
   </head>
   <body>
+    {% render 'lit_example' %}
     {{ content_for_layout }}
     {% render 'js_translations' %}
     <script type="module" src="{{ 'main.js' | asset_url }}"></script>
