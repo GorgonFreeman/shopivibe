@@ -103,8 +103,45 @@ function buildStore(storeId) {
 
   mergeIntoDest(path.join(REGIONAL_DIR, storeId), distDir);
   generateJsTranslations(distDir);
+  injectViteRenders(distDir);
 
   return distDir;
+}
+
+function camelToSnake(str) {
+  return str.replace(/([A-Z])/g, (_, c) => '_' + c.toLowerCase()).replace(/^_/, '');
+}
+
+function scriptNameToLiquidPath(scriptName) {
+  const match = scriptName.match(/^(snippets|sections)_(.+)$/);
+  if (!match) return null;
+  const [ , type, name ] = match;
+  const snake = camelToSnake(name).replace(/_+/g, '_');
+  return `${ type }/${ snake }.liquid`;
+}
+
+function injectViteRenders(distDir) {
+  const buildAssets = path.join(BUILD_DIR, 'assets');
+  if (!fs.existsSync(buildAssets)) return;
+
+  const viteRender = (entry) => `{% render 'vite' with '${ entry }' %}\n`;
+
+  for (const file of fs.readdirSync(buildAssets)) {
+    if (!file.endsWith('.js')) continue;
+    const entry = file.replace(/\.js$/, '');
+    const liquidPath = scriptNameToLiquidPath(entry);
+    if (!liquidPath) continue;
+
+    const fullPath = path.join(distDir, liquidPath);
+    if (!fs.existsSync(fullPath)) continue;
+
+    let content = fs.readFileSync(fullPath, 'utf8');
+    const renderLine = viteRender(entry);
+    if (content.includes(`render 'vite' with '${ entry }'`)) continue;
+
+    content = renderLine + content;
+    fs.writeFileSync(fullPath, content);
+  }
 }
 
 async function runViteBuild() {
