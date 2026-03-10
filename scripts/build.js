@@ -22,6 +22,7 @@ function copyRecursive(src, dest, skipDirs = []) {
       copyRecursive(path.join(src, entry), path.join(dest, entry), skipDirs);
     }
   } else {
+    if (path.basename(src) === '.gitkeep') return;
     fs.copyFileSync(src, dest);
   }
 }
@@ -36,6 +37,7 @@ function mergeIntoDest(srcDir, destDir) {
       fs.mkdirSync(destPath, { recursive: true });
       mergeIntoDest(srcPath, destPath);
     } else {
+      if (entry === '.gitkeep') continue;
       fs.copyFileSync(srcPath, destPath);
     }
   }
