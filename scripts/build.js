@@ -43,6 +43,34 @@ function mergeIntoDest(srcDir, destDir) {
   }
 }
 
+function copyIfChanged(srcPath, destPath) {
+  if (path.basename(srcPath) === '.gitkeep') return false;
+  if (!fs.existsSync(srcPath)) return false;
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  if (fs.existsSync(destPath)) {
+    const srcBuf = fs.readFileSync(srcPath);
+    const destBuf = fs.readFileSync(destPath);
+    if (srcBuf.equals(destBuf)) return false;
+  }
+  fs.copyFileSync(srcPath, destPath);
+  return true;
+}
+
+function mergeAssetsIfChanged(srcDir, destDir) {
+  if (!fs.existsSync(srcDir)) return;
+  for (const entry of fs.readdirSync(srcDir)) {
+    const srcPath = path.join(srcDir, entry);
+    const destPath = path.join(destDir, entry);
+    const stat = fs.statSync(srcPath);
+    if (stat.isDirectory()) {
+      fs.mkdirSync(destPath, { recursive: true });
+      mergeAssetsIfChanged(srcPath, destPath);
+    } else {
+      copyIfChanged(srcPath, destPath);
+    }
+  }
+}
+
 function generateJsTranslations(distDir) {
   const localesDir = path.join(distDir, 'locales');
   if (!fs.existsSync(localesDir)) return;
@@ -149,6 +177,58 @@ async function runViteBuild() {
   await build({ configFile: configPath });
 }
 
+function getRelPath(base, fullPath) {
+  const rel = path.relative(base, fullPath);
+  return path.normalize(rel).replace(/\\/g, '/');
+}
+
+async function incrementalUpdate(stores, filePath, event) {
+  const absPath = path.resolve(filePath);
+  const scriptsDir = path.join(SRC_DIR, 'scripts');
+  const stylesDir = path.join(SRC_DIR, 'styles');
+  const localesDir = path.join(SRC_DIR, 'locales');
+  const needsVite = absPath.startsWith(scriptsDir) || absPath.startsWith(stylesDir);
+  const touchesLocales = absPath.startsWith(localesDir);
+
+  if (needsVite) {
+    await runViteBuild();
+  }
+
+  for (const storeId of stores) {
+    const distDir = path.join(DIST_BASE, storeId);
+    const regionalStore = path.join(REGIONAL_DIR, storeId);
+
+    if (absPath.startsWith(regionalStore)) {
+      const rel = getRelPath(regionalStore, absPath);
+      const destPath = path.join(distDir, rel);
+      if (event === 'unlink') {
+        if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+      } else {
+        copyIfChanged(absPath, destPath);
+      }
+    } else if (absPath.startsWith(SRC_DIR)) {
+      const rel = getRelPath(SRC_DIR, absPath);
+      if (!SKIP_COPY.some((d) => rel.startsWith(d + '/'))) {
+        const destPath = path.join(distDir, rel);
+        if (event === 'unlink') {
+          if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+        } else {
+          copyIfChanged(absPath, destPath);
+        }
+        injectViteRenders(distDir);
+      }
+    }
+
+    if (needsVite) {
+      const assetsDir = path.join(distDir, 'assets');
+      fs.mkdirSync(assetsDir, { recursive: true });
+      mergeAssetsIfChanged(path.join(BUILD_DIR, 'assets'), assetsDir);
+      injectViteRenders(distDir);
+    }
+    if (touchesLocales) generateJsTranslations(distDir);
+  }
+}
+
 async function main() {
   let stores = process.argv.slice(2);
   if (stores.length === 0 && process.env.STORES) {
@@ -168,7 +248,11 @@ async function main() {
   }
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+} else {
+  module.exports = { incrementalUpdate, runViteBuild, buildStore };
+}

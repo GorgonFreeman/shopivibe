@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { getStores, loadStoreCreds } = require('./lib/common');
+const { incrementalUpdate, runViteBuild, buildStore } = require('./build');
 
 const SRC_DIR = path.join(__dirname, '..', 'src');
 const REGIONAL_DIR = path.join(__dirname, '..', 'regional');
@@ -50,22 +51,41 @@ async function main() {
     ignored: /(^|[\/\\])\../,
     persistent: true,
     ignoreInitial: true,
+    atomic: true,
   });
 
-  watcher.on('change', (filePath) => {
-    console.log(`[watch] ${ filePath } changed, rebuilding...`);
-    runBuild(stores).catch((e) => console.error('[watch] rebuild failed:', e.message));
-  });
+  let buildInProgress = false;
+  let pendingPath = null;
+  let pendingEvent = null;
 
-  watcher.on('add', (filePath) => {
-    console.log(`[watch] ${ filePath } added, rebuilding...`);
-    runBuild(stores).catch((e) => console.error('[watch] rebuild failed:', e.message));
-  });
+  const runIncremental = async (event, filePath) => {
+    if (buildInProgress) {
+      pendingPath = filePath;
+      pendingEvent = event;
+      return;
+    }
+    buildInProgress = true;
+    try {
+      console.log(`[watch] ${ filePath } ${ event }, updating...`);
+      await incrementalUpdate(stores, filePath, event);
+    } catch (e) {
+      console.error('[watch] incremental failed, running full build:', e.message);
+      await runBuild(stores);
+    } finally {
+      buildInProgress = false;
+      if (pendingPath) {
+        const p = pendingPath;
+        const ev = pendingEvent;
+        pendingPath = null;
+        pendingEvent = null;
+        runIncremental(ev, p);
+      }
+    }
+  };
 
-  watcher.on('unlink', (filePath) => {
-    console.log(`[watch] ${ filePath } removed, rebuilding...`);
-    runBuild(stores).catch((e) => console.error('[watch] rebuild failed:', e.message));
-  });
+  watcher.on('change', (filePath) => runIncremental('change', filePath));
+  watcher.on('add', (filePath) => runIncremental('add', filePath));
+  watcher.on('unlink', (filePath) => runIncremental('unlink', filePath));
 
   watcher.on('ready', () => {
     console.log('[watch] Watching:', watchPaths.join(', '));
