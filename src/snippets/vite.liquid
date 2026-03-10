@@ -1,0 +1,6 @@
+{% comment %}
+  Load a script as ES module. Browser deduplicates by URL.
+  {% render 'vite' with 'snippets_productTile' %}
+{% endcomment %}
+{% assign entry = entry | default: vite %}
+<script type="module" src="{{ entry | append: '.js' | asset_url }}"></script>

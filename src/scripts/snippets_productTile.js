@@ -1,6 +1,6 @@
 /**
  * Paired with snippets/product_tile.liquid.
- * Add {% render 'script_once', name: 'snippets_productTile' %} to the snippet.
- * Loads once per page even if the snippet appears multiple times.
+ * Add {% render 'vite' with 'snippets_productTile' %} to the snippet.
+ * ES modules deduplicate by URL, so loads once per page.
  */
 export function initProductTile() {}
