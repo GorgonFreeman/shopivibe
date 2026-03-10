@@ -1,0 +1,10 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Rechercher"
+    }
+  },
+  "products": {
+    "add_to_cart": "Ajouter au panier"
+  }
+}

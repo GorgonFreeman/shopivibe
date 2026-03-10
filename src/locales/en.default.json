@@ -3,5 +3,8 @@
     "search": {
       "placeholder": "Search"
     }
+  },
+  "products": {
+    "add_to_cart": "Add to cart"
   }
 }

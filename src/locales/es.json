@@ -1,0 +1,10 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Buscar"
+    }
+  },
+  "products": {
+    "add_to_cart": "Añadir al carrito"
+  }
+}
