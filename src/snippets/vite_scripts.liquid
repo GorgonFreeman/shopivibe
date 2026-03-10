@@ -3,8 +3,10 @@
 {% endcomment %}
 {% case script_name %}
 {% when 'sections_product' %}
-  {% render 'vite', entry: 'sections_product.js' %}
+  <script src="{{ 'sections_product-DT1p908R.js' | asset_url | split: '?' | first }}" type="module" crossorigin="anonymous"></script>
 {% when 'theme' %}
-  {% render 'vite', entry: 'theme.js' %}
+  <script src="{{ 'theme-Bhnv3l0Y.js' | asset_url | split: '?' | first }}" type="module" crossorigin="anonymous"></script>
+{% when 'style_theme' %}
+  {{ 'style_theme-fFbo2aJN.css' | asset_url | split: '?' | first | stylesheet_tag: preload: preload_stylesheet }}
 {% else %}
 {% endcase %}

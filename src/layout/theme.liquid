@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% render 'vite', entry: 'src/styles/theme.css' %}
+    {% render 'vite_scripts', script_name: 'style_theme' %}
     {{ content_for_header }}
   </head>
   <body>
-    hihihi
     {{ content_for_layout }}
   </body>
 </html>

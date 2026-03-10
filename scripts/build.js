@@ -8,7 +8,7 @@ const SRC_DIR = path.join(__dirname, '..', 'src');
 const REGIONAL_DIR = path.join(__dirname, '..', 'regional');
 const DIST_BASE = path.join(__dirname, '..', 'dist');
 const PROJECT_ROOT = path.join(__dirname, '..');
-const VITE_ASSETS_STAGING = path.join(DIST_BASE, '.vite-assets');
+const BUILD_ASSETS = path.join(PROJECT_ROOT, 'build', 'assets');
 
 function clearDist() {
   if (fs.existsSync(DIST_BASE)) {
@@ -42,14 +42,6 @@ function copyRecursive(src, dest, excludeDir) {
   }
 }
 
-function moveViteAssetsOutOfSrc() {
-  const srcAssets = path.join(SRC_DIR, 'assets');
-  if (!fs.existsSync(srcAssets)) return;
-  fs.mkdirSync(VITE_ASSETS_STAGING, { recursive: true });
-  mergeIntoDest(srcAssets, VITE_ASSETS_STAGING);
-  fs.rmSync(srcAssets, { recursive: true });
-}
-
 function mergeIntoDest(srcDir, destDir) {
   if (!fs.existsSync(srcDir)) return;
   const entries = fs.readdirSync(srcDir);
@@ -71,8 +63,13 @@ function mergeIntoDest(srcDir, destDir) {
 function buildStore(storeId) {
   const distDir = path.join(DIST_BASE, storeId);
   fs.mkdirSync(distDir, { recursive: true });
-  copyRecursive(SRC_DIR, distDir, 'assets');
-  mergeIntoDest(VITE_ASSETS_STAGING, path.join(distDir, 'assets'));
+  copyRecursive(SRC_DIR, distDir);
+  const buildAssetsDir = path.join(BUILD_ASSETS, 'assets');
+  const distAssets = path.join(distDir, 'assets');
+  fs.mkdirSync(distAssets, { recursive: true });
+  if (fs.existsSync(buildAssetsDir)) {
+    mergeIntoDest(buildAssetsDir, distAssets);
+  }
   const regionalStoreDir = path.join(REGIONAL_DIR, storeId);
   if (fs.existsSync(regionalStoreDir)) {
     mergeIntoDest(regionalStoreDir, distDir);
@@ -82,6 +79,7 @@ function buildStore(storeId) {
 
 function build(stores) {
   clearDist();
+  runViteBuild();
   const viteBuildResult = spawnSync('node', [ path.join(__dirname, 'vite-build.js') ], {
     cwd: PROJECT_ROOT,
     stdio: 'inherit',
@@ -89,8 +87,6 @@ function build(stores) {
   if (viteBuildResult.status !== 0) {
     process.exit(viteBuildResult.status);
   }
-  runViteBuild();
-  moveViteAssetsOutOfSrc();
   for (const storeId of stores) {
     const distDir = buildStore(storeId);
     console.log(`Built dist/${ storeId }`);
