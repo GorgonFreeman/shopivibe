@@ -17,9 +17,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node scripts/build.js",
-    "w": "node scripts/watch.js",
-    "down": "node scripts/down.js",
-    "up": "node scripts/up.js"
+    "watch": "node scripts/watch.js",
+    "download": "node scripts/download.js",
+    "upload": "node scripts/upload.js",
+    "deploy": "node scripts/deploy.js"
   },
   "devDependencies": {
     "@shopify/cli": "^3.78.0",

@@ -72,7 +72,7 @@ function runThemePull(storeId, pullPath, useLive) {
   return new Promise((resolve, reject) => {
     const creds = loadStoreCreds(storeId);
     const storeUrl = creds.STORE_URL || storeId;
-    const args = ['theme', 'pull', '--path', pullPath, '--store', storeUrl];
+    const args = [ 'theme', 'pull', '--path', pullPath, '--store', storeUrl ];
     if (useLive) args.push('--live');
 
     const env = { ...process.env };

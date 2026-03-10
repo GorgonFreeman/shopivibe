@@ -19,7 +19,9 @@ When starting any build process, you will be asked which stores you want to incl
 
 As many stores as you select is as many dist directories as will be made. Each will use their own regionalised files from /regional, in addition to any files from src.
 
-e.g. if you run npm run watch, you are asked which stores you want to develop on, and if you say "au, us and uk", you will get 3 dist directories, all watching.
+e.g. if you run `npm run watch`, you are asked which stores you want to develop on, and if you say "au, us and uk", you will get 3 dist directories, all watching.
+
+**Commands:** `watch` (dev + file watcher), `download` (pull from Shopify, same as down), `upload` (select theme per store, push over it), `deploy` (create new theme per store with given name).
 
 Any terminal processes will be done in their own tabs so that you can answer questions. 
 
