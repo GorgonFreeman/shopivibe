@@ -10,6 +10,12 @@ const DIST_BASE = path.join(__dirname, '..', 'dist');
 const PROJECT_ROOT = path.join(__dirname, '..');
 const VITE_ASSETS_STAGING = path.join(DIST_BASE, '.vite-assets');
 
+function clearDist() {
+  if (fs.existsSync(DIST_BASE)) {
+    fs.rmSync(DIST_BASE, { recursive: true });
+  }
+}
+
 function runViteBuild() {
   const result = spawnSync('npx', [ 'vite', 'build' ], {
     cwd: PROJECT_ROOT,
@@ -75,6 +81,7 @@ function buildStore(storeId) {
 }
 
 function build(stores) {
+  clearDist();
   const viteBuildResult = spawnSync('node', [ path.join(__dirname, 'vite-build.js') ], {
     cwd: PROJECT_ROOT,
     stdio: 'inherit',
