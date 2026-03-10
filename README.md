@@ -22,3 +22,25 @@ As many stores as you select is as many dist directories as will be made. Each w
 e.g. if you run npm run watch, you are asked which stores you want to develop on, and if you say "au, us and uk", you will get 3 dist directories, all watching.
 
 Any terminal processes will be done in their own tabs so that you can answer questions. 
+
+## Build Process
+
+We use Lit, Tailwind and Vite.
+
+src is built to dist/{store} for each store being built.
+
+src/scripts are built to dist/{store}/assets.
+
+src/styles are built to dist/{store}/assets.
+
+Snippets and sections are paired with scripts, to enable deduplication and bundling. e.g. snippets/product_tile.liquid is paired with snippets_productTile.js, or snippets_ProductTile.js, or snippets_product_tile.js. 
+
+The user just has to create a snippet, then the corresponding script, to enable this. If product_tile.liquid appears twice on a page, the scripts for it will only load once.
+
+### Regional files
+
+After build, regional files from regional/{store} are added to the built files.
+
+### Translations
+
+After regional files are added, all locales from dist/{store}/locales are indexed in a single snippet called js_translations.liquid. The snippet should include all translations by their locale name, and can be included for use by scripts.
