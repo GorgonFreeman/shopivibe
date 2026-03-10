@@ -15,7 +15,7 @@ You have a .creds.yml.
 
 Inside the shopify creds, each top-level node is a store.
 
-When starting any build process, you will be asked which stores you want to include, unless you have a .env variable "STORES" already set.
+When starting any build process, you will be asked which stores you want to include, unless you have the STORES environment variable already set (e.g. `STORES=au,us,uk`).
 
 As many stores as you select is as many dist directories as will be made. Each will use their own regionalised files from /regional, in addition to any files from src.
 
@@ -25,13 +25,13 @@ Any terminal processes will be done in their own tabs so that you can answer que
 
 ## Vite build process
 
-We will use Tailwind and Lit. Scripts should build from the src/scripts  directory. Any top-level files here should be built.
+We use Tailwind and Lit. Scripts build from `src/scripts`, styles from `src/styles`. Any top-level files in these directories are built as entry points.
 
-A "vite_scripts.liquid" snippet should be created and maintained by the build process, containing a big switch statement that includes the correct JS. For any snippet or section whose name matches a corresponding script in src/scripts, the vite_scripts snippet should be rendered at the top, with a newline, and referencing the file. Could be something like 'snippets_product_tile' for snippets/product_tile.liquid or 'sections_product' for sections/product.json.
+A `vite_scripts.liquid` snippet is created and maintained by the build process, containing a switch statement that includes the correct JS for each entry. Injection into source files happens **only when both** exist: a matching section/snippet **and** a corresponding script in `src/scripts`. For example, `snippets/product_tile.liquid` + `src/scripts/snippets_product_tile.js` → inject at top of the liquid file. Same for sections: `sections/product.liquid` + `src/scripts/sections_product.js` → inject.
 
-It can also be manually used for other cases.
+The snippet can also be manually used for other cases.
 
-JS should be bundled and deduplicated so that if two product_tile.liquid snippets are included on the same page, their common scripts are not loaded twice.
+JS is bundled and deduplicated so that if two `product_tile.liquid` snippets are included on the same page, their common scripts are not loaded twice.
 
-This is similar to 'vite-plugin-shopify'.
+This is similar to `vite-plugin-shopify`.
 

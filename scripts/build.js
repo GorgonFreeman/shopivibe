@@ -2,21 +2,46 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const SRC_DIR = path.join(__dirname, '..', 'src');
 const REGIONAL_DIR = path.join(__dirname, '..', 'regional');
 const DIST_BASE = path.join(__dirname, '..', 'dist');
+const PROJECT_ROOT = path.join(__dirname, '..');
+const VITE_ASSETS_STAGING = path.join(DIST_BASE, '.vite-assets');
 
-function copyRecursive(src, dest) {
+function runViteBuild() {
+  const result = spawnSync('npx', [ 'vite', 'build' ], {
+    cwd: PROJECT_ROOT,
+    stdio: 'inherit',
+  });
+  if (result.status !== 0) {
+    process.exit(result.status);
+  }
+}
+
+function copyRecursive(src, dest, excludeDir) {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
+    if (excludeDir && path.basename(src) === excludeDir) return;
     fs.mkdirSync(dest, { recursive: true });
     for (const entry of fs.readdirSync(src)) {
-      copyRecursive(path.join(src, entry), path.join(dest, entry));
+      const srcPath = path.join(src, entry);
+      const destPath = path.join(dest, entry);
+      if (excludeDir && entry === excludeDir) continue;
+      copyRecursive(srcPath, destPath, excludeDir);
     }
   } else {
     fs.copyFileSync(src, dest);
   }
+}
+
+function moveViteAssetsOutOfSrc() {
+  const srcAssets = path.join(SRC_DIR, 'assets');
+  if (!fs.existsSync(srcAssets)) return;
+  fs.mkdirSync(VITE_ASSETS_STAGING, { recursive: true });
+  mergeIntoDest(srcAssets, VITE_ASSETS_STAGING);
+  fs.rmSync(srcAssets, { recursive: true });
 }
 
 function mergeIntoDest(srcDir, destDir) {
@@ -40,7 +65,8 @@ function mergeIntoDest(srcDir, destDir) {
 function buildStore(storeId) {
   const distDir = path.join(DIST_BASE, storeId);
   fs.mkdirSync(distDir, { recursive: true });
-  copyRecursive(SRC_DIR, distDir);
+  copyRecursive(SRC_DIR, distDir, 'assets');
+  mergeIntoDest(VITE_ASSETS_STAGING, path.join(distDir, 'assets'));
   const regionalStoreDir = path.join(REGIONAL_DIR, storeId);
   if (fs.existsSync(regionalStoreDir)) {
     mergeIntoDest(regionalStoreDir, distDir);
@@ -49,6 +75,15 @@ function buildStore(storeId) {
 }
 
 function build(stores) {
+  const viteBuildResult = spawnSync('node', [ path.join(__dirname, 'vite-build.js') ], {
+    cwd: PROJECT_ROOT,
+    stdio: 'inherit',
+  });
+  if (viteBuildResult.status !== 0) {
+    process.exit(viteBuildResult.status);
+  }
+  runViteBuild();
+  moveViteAssetsOutOfSrc();
   for (const storeId of stores) {
     const distDir = buildStore(storeId);
     console.log(`Built dist/${ storeId }`);

@@ -97,6 +97,17 @@ async function pullStore(storeId, stores, useLive) {
   }
 }
 
+function runBuild(stores) {
+  const { spawnSync } = require('child_process');
+  const result = spawnSync('node', [ path.join(__dirname, 'build.js'), ...stores ], {
+    cwd: PROJECT_ROOT,
+    stdio: 'inherit',
+  });
+  if (result.status !== 0) {
+    process.exit(result.status);
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const useLive = args.includes('--live');
@@ -112,6 +123,9 @@ async function main() {
   }
 
   console.log('\nAll stores pulled.');
+  console.log('\nRebuilding (vite-build, vite build)...');
+  runBuild(stores);
+  console.log('\nBuild complete.');
 }
 
 main().catch((e) => {
