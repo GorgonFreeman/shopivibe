@@ -119,6 +119,9 @@ ${ caseBranches }
 
 function buildStore(storeId) {
   const distDir = path.join(DIST_BASE, storeId);
+  if (fs.existsSync(distDir)) {
+    fs.rmSync(distDir, { recursive: true });
+  }
   fs.mkdirSync(distDir, { recursive: true });
   copyRecursive(SRC_DIR, distDir, SKIP_COPY);
 
