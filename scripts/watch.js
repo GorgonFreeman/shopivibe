@@ -6,15 +6,13 @@ const path = require('path');
 
 const { getStores, loadStoreCreds } = require('./lib/common');
 const { incrementalUpdate, runViteBuild, buildStore } = require('./build');
-
-const SRC_DIR = path.join(__dirname, '..', 'src');
-const REGIONAL_DIR = path.join(__dirname, '..', 'regional');
+const { ROOT, SRC_DIR, REGIONAL_DIR, DIST_BASE } = require('./constants');
 
 function runBuild(stores) {
   return new Promise((resolve, reject) => {
     const child = spawn('node', [path.join(__dirname, 'build.js'), ...stores], {
       stdio: 'inherit',
-      cwd: path.join(__dirname, '..'),
+      cwd: ROOT,
     });
     child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`build exited ${ code }`))));
   });
@@ -24,7 +22,7 @@ function getThemeDevCommand(storeId, distDir, port) {
   const creds = loadStoreCreds(storeId);
   const storeUrl = creds.STORE_URL || storeId;
   const envPrefix = creds.SHOPIFY_API_KEY ? `SHOPIFY_API_KEY=${ creds.SHOPIFY_API_KEY } ` : '';
-  return `${ envPrefix }shopify theme dev --path ${ distDir } --store ${ storeUrl } --port ${ port } --live-reload hot-reload`;
+  return `${ envPrefix }shopify theme dev --store ${ storeUrl } --port ${ port } --live-reload full-page`;
 }
 
 function getWatchPaths(stores) {
@@ -91,33 +89,33 @@ async function main() {
     console.log('[watch] Watching:', watchPaths.join(', '));
   });
 
-  const projectRoot = path.join(__dirname, '..');
   const basePort = 9292;
   const isMac = process.platform === 'darwin';
 
   if (isMac) {
     console.log('\nOpening theme dev for', stores.join(', '), 'in separate tabs...\n');
     stores.forEach((storeId, i) => {
-      const distDir = path.join(projectRoot, 'dist', storeId);
+      const distDir = path.join(DIST_BASE, storeId);
       const port = basePort + i;
       const cmd = getThemeDevCommand(storeId, distDir, port);
-      spawn('npx', ['ttab', '-t', `shopivibe ${ storeId }`, '-d', projectRoot, cmd], {
+      spawn('npx', ['ttab', '-t', `shopivibe ${ storeId }`, '-d', distDir, cmd], {
         stdio: 'inherit',
-        cwd: projectRoot,
+        cwd: ROOT,
       });
     });
     console.log('File watcher running in this tab. Theme dev processes are in the new tabs.');
   } else {
     const concurrentArgs = ['-n', stores.join(','), '-c', 'cyan,magenta,green'];
     stores.forEach((storeId, i) => {
-      const distDir = path.join(projectRoot, 'dist', storeId);
+      const distDir = path.join(DIST_BASE, storeId);
       const port = basePort + i;
-      concurrentArgs.push(getThemeDevCommand(storeId, distDir, port));
+      const cmd = getThemeDevCommand(storeId, distDir, port);
+      concurrentArgs.push(`cd ${ path.relative(ROOT, distDir) } && ${ cmd }`);
     });
     console.log('\nStarting theme dev for', stores.join(', '), '(interactivity may be limited in one window)...\n');
     const concurrent = spawn('npx', ['concurrently', ...concurrentArgs], {
       stdio: 'inherit',
-      cwd: projectRoot,
+      cwd: ROOT,
     });
     process.on('SIGINT', () => {
       concurrent.kill('SIGINT');

@@ -8,9 +8,7 @@ const chalk = require('chalk');
 
 const { getStores, loadStoreCreds } = require('./lib/common');
 const { runViteBuild, buildStore } = require('./build');
-
-const ROOT = path.join(__dirname, '..');
-const DIST_BASE = path.join(ROOT, 'dist');
+const { ROOT, DIST_BASE } = require('./constants');
 
 function promptThemeName() {
   if (process.env.THEME_NAME) {

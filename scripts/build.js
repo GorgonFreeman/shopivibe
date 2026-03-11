@@ -4,13 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { build } = require('vite');
 
-const ROOT = path.join(__dirname, '..');
-const SRC_DIR = path.join(ROOT, 'src');
-const REGIONAL_DIR = path.join(ROOT, 'regional');
-const DIST_BASE = path.join(ROOT, 'dist');
-const BUILD_DIR = path.join(DIST_BASE, '_build');
-
-const SKIP_COPY = ['scripts', 'styles', 'assets'];
+const { ROOT, SRC_DIR, REGIONAL_DIR, DIST_BASE, BUILD_DIR, SKIP_COPY } = require('./constants');
 
 function copyRecursive(src, dest, skipDirs = []) {
   const stat = fs.statSync(src);

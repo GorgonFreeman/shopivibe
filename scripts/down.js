@@ -5,11 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { getStores, loadStoreCreds } = require('./lib/common');
-
-const SRC_DIR = path.join(__dirname, '..', 'src');
-const REGIONAL_DIR = path.join(__dirname, '..', 'regional');
-const PROJECT_ROOT = path.join(__dirname, '..');
-const PULL_TEMP = path.join(PROJECT_ROOT, 'dist', '.pull-temp');
+const { ROOT, SRC_DIR, REGIONAL_DIR, PULL_TEMP } = require('./constants');
 
 function getAllFiles(dir, base = '') {
   const results = [];
@@ -80,7 +76,7 @@ function runThemePull(storeId, pullPath, useLive) {
 
     const child = spawn('shopify', args, {
       stdio: 'inherit',
-      cwd: PROJECT_ROOT,
+      cwd: ROOT,
       env,
     });
     child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`theme pull exited ${ code }`))));
