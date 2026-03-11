@@ -19,7 +19,7 @@
     "build": "node scripts/build.js",
     "w": "node scripts/watch.js",
     "down": "node scripts/down.js",
-    "up": "shopify theme push --path ./src"
+    "up": "node scripts/up.js"
   },
   "devDependencies": {
     "@shopify/cli": "^3.78.0",
