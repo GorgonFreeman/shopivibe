@@ -1,5 +1,17 @@
 {{ collection | json }}
 
+{% paginate collection.products by 10 %}
+  {% for product in collection.products %}
+    <div>
+      <a href="{{ product.url }}" target="_blank">
+        {{ product.title }}
+      </a>
+    </div>
+  {% endfor %}
+
+  {{ paginate | default_pagination }}
+{% endpaginate %}
+
 {% schema %}
   {
     "name": "Collection",
