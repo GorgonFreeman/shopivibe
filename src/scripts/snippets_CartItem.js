@@ -18,6 +18,9 @@ class CartItem extends LitElement {
     itemEl.classList.add('opacity-10');
     const removeResponse = await this.removeItem(itemId);
     console.log(removeResponse);
+    // TODO: Check what happens with an error
+    // TODO: Inspect the cart to determine if there are any removed or new items
+    // TODO: Consider decentralised cart assessment system - don't remove or add items until this assessor makes a decision?
     itemEl.remove();
   }
 
