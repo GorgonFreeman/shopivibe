@@ -1,14 +1,15 @@
-import { LitElement, html } from 'lit';
+import { LitElement } from 'lit';
+import { query } from 'lit/decorators.js';
 import { customAxios, wait } from './utils';
 
 class CartItem extends LitElement {
   createRenderRoot() { return this; }
 
+  @query('[data-ref="remove"]') removeButton;
+
   connectedCallback() {
     super.connectedCallback();
-    // Listeners
-    const removeButton = this.querySelector('a');
-    removeButton.addEventListener('click', e => this.removeItemHandler(e));
+    this.removeButton?.addEventListener('click', e => this.removeItemHandler(e));
   }
 
   async removeItemHandler(e) {
