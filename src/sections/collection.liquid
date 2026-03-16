@@ -6,6 +6,7 @@
       <a href="{{ product.url }}" target="_blank">
         {{ product.title }}
       </a>
+      {% render 'buy_button', product: product %}
     </div>
   {% endfor %}
 
