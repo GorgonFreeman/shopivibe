@@ -1,4 +1,10 @@
-{{ cart | json }}
+{% comment %}{{ cart | json }}{% endcomment %}
+
+{% if cart.item_count > 0 %}
+  {% render 'cart_items' %}
+{% else %}
+  {% render 'cart_empty' %}
+{% endif %}
 
 {% schema %}
   {
