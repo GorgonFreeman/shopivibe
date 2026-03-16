@@ -13,7 +13,7 @@ class CartItem extends LitElement {
 
   async removeItemHandler(e) {
     e.preventDefault();
-    const itemId = e.target.href.split('=')[1];
+    const itemId = new URL(e.target.href).searchParams.get('id');
     const itemEl = e.target.closest('cart-item');
 
     // Start removing visually
