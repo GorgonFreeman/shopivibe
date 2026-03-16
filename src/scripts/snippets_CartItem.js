@@ -33,7 +33,7 @@ class CartItem extends LitElement {
 
   async removeItem(itemId) {
     return customAxios(
-      `/cart/change.js?idx=${ itemId }&quantity=0`,
+      `/cart/change.js?id=${ itemId }&quantity=0`,
       {
         method: 'post',
       },
