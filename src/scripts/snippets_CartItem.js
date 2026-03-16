@@ -15,7 +15,7 @@ class CartItem extends LitElement {
     e.preventDefault();
     const itemId = e.target.href.split('=')[1];
     const removeResponse = await customAxios(
-      `/cart/change?id=${ itemId }&quantity=0`,
+      `/cart/change.js?id=${ itemId }&quantity=0`,
       {
         method: 'post',
       },
