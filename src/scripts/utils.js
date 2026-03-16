@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const wait = (ms) => new Promise((resolve, reject) => setTimeout(resolve, ms));
+
 const arrayFromIntRange = (start, end, { step = 1 } = {}) => {
   start = parseInt(start);
   end = parseInt(end);
@@ -134,5 +136,6 @@ const customAxios = async (url, {
 };
 
 export { 
+  wait,
   customAxios,
 };
