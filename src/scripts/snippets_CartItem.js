@@ -15,14 +15,15 @@ class CartItem extends LitElement {
     e.preventDefault();
     const itemId = e.target.href.split('=')[1];
     const itemEl = e.target.closest('cart-item');
-    itemEl.classList.add('opacity-10');
+    itemEl.classList.remove('_animate_in');
+    itemEl.classList.add('_animate_out');
     const removeResponse = await this.removeItem(itemId);
     console.log({ removeResponse });
 
     if (removeResponse.success) {
       itemEl.remove();
     } else {
-      itemEl.classList.remove('opacity-10');
+      itemEl.classList.remove('_animate_out');
       console.error(removeResponse.error);
     }
 
