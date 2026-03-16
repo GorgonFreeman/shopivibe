@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customAxios } from './utils';
+import { customAxios, wait } from './utils';
 
 class CartItem extends LitElement {
   createRenderRoot() { return this; }
@@ -15,14 +15,23 @@ class CartItem extends LitElement {
     e.preventDefault();
     const itemId = e.target.href.split('=')[1];
     const itemEl = e.target.closest('cart-item');
+
+    // Start removing visually
     itemEl.classList.remove('_animate_in');
     itemEl.classList.add('_animate_out');
-    const removeResponse = await this.removeItem(itemId);
+
+    // Use Promise.all to ensure this takes as long as the animation
+    const [, removeResponse] = await Promise.all([
+      wait(200),
+      this.removeItem(itemId),
+    ]);
     console.log({ removeResponse });
 
     if (removeResponse.success) {
+      // If it worked, actually remove the element from the DOM
       itemEl.remove();
     } else {
+      // Otherwise, restore the element visually
       itemEl.classList.remove('_animate_out');
       console.error(removeResponse.error);
     }
