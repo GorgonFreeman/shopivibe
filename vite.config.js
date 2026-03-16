@@ -18,6 +18,9 @@ try {
 
 export default defineConfig({
   plugins: [tailwindcss()],
+  oxc: {
+    decorators: { legacy: true },
+  },
   build: {
     outDir: 'dist/_build',
     assetsDir: 'assets',
