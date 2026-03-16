@@ -33,5 +33,8 @@
     "tailwindcss": "^4.2.1",
     "ttab": "^0.9.0",
     "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "axios": "^1.13.6"
   }
 }
