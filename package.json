@@ -19,7 +19,9 @@
     "build": "node scripts/build.js",
     "w": "node scripts/watch.js",
     "down": "node scripts/down.js",
-    "up": "node scripts/up.js"
+    "up": "node scripts/up.js",
+    "v2:build": "node scripts/v2/build.mjs",
+    "v2:w": "node scripts/v2/watch.mjs"
   },
   "devDependencies": {
     "@shopify/cli": "^3.78.0",
