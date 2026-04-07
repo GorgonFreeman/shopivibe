@@ -145,6 +145,38 @@ function scriptNameToLiquidPath(scriptName) {
   return `${ type }/${ snake }.liquid`;
 }
 
+/**
+ * Directories under dist/ that are full theme outputs (not Vite’s build staging).
+ */
+function discoverDistStoreIds() {
+  if (!fs.existsSync(DIST_BASE)) return [];
+  return fs
+    .readdirSync(DIST_BASE)
+    .filter((name) => {
+      if (name === '_build' || name.startsWith('.')) return false;
+      return fs.statSync(path.join(DIST_BASE, name)).isDirectory();
+    });
+}
+
+/**
+ * Copy dist/_build/assets into each dist/<store>/assets (and refresh vite snippet renders).
+ * Standalone `vite build` only writes to _build; this keeps per-store theme folders in sync.
+ */
+function syncViteAssetsToDistStores(storeIds) {
+  const ids = storeIds?.length ? storeIds : discoverDistStoreIds();
+  const buildAssets = path.join(BUILD_DIR, 'assets');
+  if (!fs.existsSync(buildAssets)) return;
+
+  for (const storeId of ids) {
+    const distDir = path.join(DIST_BASE, storeId);
+    if (!fs.existsSync(distDir)) continue;
+    const assetsDir = path.join(distDir, 'assets');
+    fs.mkdirSync(assetsDir, { recursive: true });
+    mergeAssetsIfChanged(buildAssets, assetsDir);
+    injectViteRenders(distDir);
+  }
+}
+
 function injectViteRenders(distDir) {
   const buildAssets = path.join(BUILD_DIR, 'assets');
   if (!fs.existsSync(buildAssets)) return;
@@ -251,5 +283,10 @@ if (require.main === module) {
     process.exit(1);
   });
 } else {
-  module.exports = { incrementalUpdate, runViteBuild, buildStore };
+  module.exports = {
+    incrementalUpdate,
+    runViteBuild,
+    buildStore,
+    syncViteAssetsToDistStores,
+  };
 }
