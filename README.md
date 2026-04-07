@@ -37,6 +37,8 @@ Snippets and sections are paired with scripts, to enable deduplication and bundl
 
 The user just has to create a snippet, then the corresponding script, to enable this. If product_tile.liquid appears twice on a page, the scripts for it will only load once.
 
+An interstitial directory - staging - is used. All files are built to here, and then only the changes are sent to dist. This means comparing files based on content, and adding or removing files that are different. The reason for the staging directory is so that saves don't trigger file uploads unless a change is actually made.
+
 ### Regional files
 
 After build, regional files from regional/{store} are added to the built files.
