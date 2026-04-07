@@ -1,0 +1,10 @@
+:root {
+  --wfpink: #f8baca;
+}
+
+cart-item {
+  background-color: var(--wfpink);
+  border-radius: 15px;
+  margin: 5px;
+  padding: 15px;
+}
