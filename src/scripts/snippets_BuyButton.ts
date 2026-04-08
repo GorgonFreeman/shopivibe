@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { query } from 'lit/decorators.js';
-import { customAxios, wait, t } from './utils';
+import { customFetch, wait, t } from './utils';
 
 class BuyButton extends LitElement {
   createRenderRoot() { return this; }
@@ -26,7 +26,7 @@ class BuyButton extends LitElement {
 
     const [, response] = await Promise.all([
       wait(500),
-      customAxios('/cart/add.js', {
+      customFetch('/cart/add.js', {
         method: 'post',
         body: {
           items: [{ id: parseInt(variantId), quantity: 1 }],

@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { query } from 'lit/decorators.js';
-import { customAxios, wait } from './utils';
+import { customFetch, wait } from './utils';
 
 class CartItem extends LitElement {
   createRenderRoot() { return this; }
@@ -42,7 +42,7 @@ class CartItem extends LitElement {
   }
 
   async removeItem(itemId) {
-    return customAxios(
+    return customFetch(
       `/cart/change.js?id=${ itemId }&quantity=0`,
       {
         method: 'post',
