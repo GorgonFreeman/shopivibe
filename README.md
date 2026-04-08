@@ -54,7 +54,7 @@ Read all `staging/{store}/locales/*.json`. Generate `staging/{store}/snippets/js
 
 ### 4. Inject vite renders
 
-For each Vite-built asset matching `snippets_*.js` or `sections_*.js`, find the paired `.liquid` file in staging (e.g. `snippets_CartItem.js` → `snippets/cart_item.liquid`). Prepend `{% render 'vite' with 'snippets_CartItem.js' %}` to it (argument is the **full built asset filename**, e.g. including `.js`). Scripts load as ES modules (`type="module"`), so the browser deduplicates — if a snippet appears multiple times on a page, the script only loads once.
+For each Vite-built asset matching `snippets_*.js` or `sections_*.js`, find the paired `.liquid` file in staging (e.g. `snippets_CartItem.js` → `snippets/cart_item.liquid`). Prepend `{% render 'vite' with 'snippets_CartItem' %}` to it. The `vite.liquid` snippet appends `.js` and resolves via `asset_url`. Scripts load as ES modules (`type="module"`), so the browser deduplicates — if a snippet appears multiple times on a page, the script only loads once.
 
 ### 5. Sync staging to dist
 
@@ -100,14 +100,14 @@ For all commands, first determine which stores to act on (**Store Selection** ab
 
 1. Same as `download`, but only download `config`, `locales` and `templates/*.json`, which are the user-configured settings.
 
-| Command             | Description                                                         |
-| ------------------- | ------------------------------------------------------------------- |
-| `npm run build`     | Full build for selected stores                                      |
-| `npm run watch`     | Build + watch + theme dev                                         |
-| `npm run deploy`    | Build + ask for theme name + upload as new themes                   |
-| `npm run upload`    | Build + pick themes + upload schema + replace entire target theme   |
-| `npm run download`  | Build to staging + pick themes + download + move to src / regional |
-| `npm run sync`      | Like download, but only `config`, `locales`, `templates/*.json`    |
+| Command             | Description                                                         | Aliases                 |
+| ------------------- | ------------------------------------------------------------------- | ----------------------- |
+| `npm run build`     | Full build for selected stores                                      | b                       |
+| `npm run watch`     | Build + watch + theme dev                                           | w                       |
+| `npm run deploy`    | Build + ask for theme name + upload as new themes                   | dep                     |
+| `npm run upload`    | Build + pick themes + upload schema + upload themes                 | u, up                   |
+| `npm run download`  | Build to staging + pick themes + download + move to src             | d, down, reconcile, rec |
+| `npm run sync`      | Build to staging + pick themes + download config only + move to src | s                       |
 
 
 ## Script Pairing Convention

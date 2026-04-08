@@ -96,6 +96,18 @@ Questions and **decided answers** for the shopivibe build pipeline.
 
 ---
 
+## Additional (follow-up)
+
+18. **Shared scripts / non-entry files**  
+    **Q:** `src/scripts/utils.js` is a utility imported by other scripts, not a standalone entry. Should there be a naming convention to exclude it?  
+    **A:** **No convention.** All `src/scripts/*.js` are Vite entry points. Files like `utils.js` that don't match `snippets_*` or `sections_*` simply produce an asset with no auto-injected `{% render %}`. Vite handles chunking if other entries import them.
+
+19. **`vite.liquid` and render argument**  
+    **Q:** Should `vite.liquid` stop appending `.js` and receive the full filename instead?  
+    **A:** **Keep `vite.liquid` as-is** (it appends `.js`). The injected line passes the **stem** (e.g. `snippets_CartItem`). CSS assets are **not** auto-injected — include them manually in liquid or via JS imports.
+
+---
+
 ## Anything else
 
 17. **Free field**  
