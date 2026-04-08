@@ -31,6 +31,9 @@ class BuyButton extends LitElement {
     this.anchor.textContent = response.success
       ? t('products.added')
       : t('products.add_to_cart_error');
+
+    await wait(1000);
+    this.anchor.textContent = t('products.add_to_cart');
   }
 }
 
