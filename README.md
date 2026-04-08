@@ -1,4 +1,5 @@
 # shopivibe
+
 My ideal Shopify theme...but vibe-coded
 
 A Shopify theme built with Vite, Lit and Tailwind.
@@ -25,6 +26,7 @@ dist/{store}/         → Final output, only receives changed files
 Stores are defined in `.creds.yml` (see `.creds.yml.sample`). Each top-level key under `shopify:` is a store ID.
 
 When running build or watch, stores are selected by:
+
 1. `STORES` env var (comma-separated), e.g. `STORES=au,us,uk`
 2. Interactive prompt if `STORES` is not set
 
@@ -33,21 +35,27 @@ When running build or watch, stores are selected by:
 The build runs in this order:
 
 ### 1. Vite build
+
 All `src/scripts/*.js` files are entry points. Vite bundles them (with Tailwind processing `src/styles/`) and outputs to a temp build directory. `main.js` is the global entry. All other entries are component scripts.
 
 ### 2. Assemble to staging
+
 For each selected store, `staging/{store}/` is assembled:
+
 - Copy `src/` to `staging/{store}/`, skipping `scripts/`, `styles/`, and `assets/` dirs, and `.gitkeep` files
 - Copy Vite-built assets into `staging/{store}/assets/`
 - Merge `regional/{store}/` over `staging/{store}/` (regional files win)
 
 ### 3. Generate js_translations.liquid
+
 Read all `staging/{store}/locales/*.json`. Generate `staging/{store}/snippets/js_translations.liquid` — a Liquid `{% case %}` on `request.locale.iso_code` that sets `window.shopivibe.translations` to only the current locale's data. The `{% else %}` branch uses the `.default.json` locale as fallback.
 
 ### 4. Inject vite renders
+
 For each Vite-built asset matching `snippets_*.js` or `sections_*.js`, find the paired `.liquid` file in staging (e.g. `snippets_CartItem.js` → `snippets/cart_item.liquid`). Prepend `{% render 'vite' with 'snippets_CartItem' %}` to it. Scripts load as ES modules (`type="module"`), so the browser deduplicates — if a snippet appears multiple times on a page, the script only loads once.
 
 ### 5. Sync staging to dist
+
 Compare `staging/{store}/` against `dist/{store}/`. Only write files to dist that are new or have changed content. Delete files from dist that no longer exist in staging. This prevents unnecessary file writes, which matters because `shopify theme dev` watches dist and uploads every change.
 
 ## Commands
@@ -104,9 +112,12 @@ For all commands, first ask which stores to act on (if not defined in .env).
 
 Snippets and sections are paired with scripts by naming convention:
 
-| Liquid file | Script file (any of these work) |
-|---|---|| `snippets/cart_item.liquid` | `src/scripts/snippets_cartItem.js` or `snippets_CartItem.js` or `snippets_cart_item.js` |
-| `sections/product.liquid` | `src/scripts/sections_product.js` or `sections_Product.js` |
+
+| Liquid file                 | Script file (any of these work)                                                         |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| `snippets/cart_item.liquid` | `src/scripts/snippets_cartItem.js` or `snippets_CartItem.js` or `snippets_cart_item.js` |
+| `sections/product.liquid`   | `src/scripts/sections_product.js` or `sections_Product.js`                              |
+
 
 The build injects the `{% render 'vite' %}` call automatically. You just create the snippet and the script.
 
