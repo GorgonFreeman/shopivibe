@@ -90,14 +90,16 @@ const BASE_PORT = 9292;
 
 function themeDevCmd(storeId, port) {
   const creds = getStoreCreds(storeId);
-  const parts = [
-    'shopify', 'theme', 'dev',
-    '--store', `${ creds.STORE_URL }.myshopify.com`,
-    '--port', String(port),
-    '--live-reload', 'full-page',
-  ];
-  if (creds.SHOPIFY_API_KEY) parts.push('--password', creds.SHOPIFY_API_KEY);
-  return parts.join(' ');
+
+  // Pass API key as env var, not --password.
+  // --password expects a Theme Access token; Admin API tokens (shpat_...)
+  // cannot set the _shopify_essential cookie required for theme dev.
+  const prefix = creds.SHOPIFY_API_KEY ? `SHOPIFY_API_KEY=${ creds.SHOPIFY_API_KEY } ` : '';
+
+  return `${ prefix }shopify theme dev`
+    + ` --store ${ creds.STORE_URL }.myshopify.com`
+    + ` --port ${ port }`
+    + ` --live-reload full-page`;
 }
 
 stores.forEach((id, i) => {
