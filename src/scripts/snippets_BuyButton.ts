@@ -42,7 +42,7 @@ class BuyButton extends LitElement {
 
     this.revertId = setTimeout(() => {
       this.anchor.textContent = t('products.add_to_cart');
-    }, 1000);
+    }, 3000);
   }
 }
 
