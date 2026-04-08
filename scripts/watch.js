@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { build } from 'vite';
 import chokidar from 'chokidar';
@@ -88,19 +89,61 @@ themeWatcher.on('ready', () => console.log(chalk.gray('\n[watch] Watching for ch
 
 const BASE_PORT = 9292;
 
-function themeDevCmd(storeId, port) {
+function pidFile(storeId) {
+  return path.join(os.tmpdir(), `shopivibe_${ storeId }.pid`);
+}
+
+function writeTabScript(storeId, port) {
   const creds = getStoreCreds(storeId);
+  const mainPid = process.pid;
+  const pf = pidFile(storeId);
 
-  // Pass API key as env var, not --password.
-  // --password expects a Theme Access token; Admin API tokens (shpat_...)
-  // cannot set the _shopify_essential cookie required for theme dev.
-  const prefix = creds.SHOPIFY_API_KEY ? `SHOPIFY_API_KEY=${ creds.SHOPIFY_API_KEY } ` : '';
+  // Each tab script:
+  //  - captures its tty so it can close itself via AppleScript
+  //  - backgrounds shopify theme dev and writes its PID for the main process
+  //  - runs a monitor that kills theme dev when the main process exits
+  //  - on EXIT (any cause), signals the main process and closes the tab
+  const script = [
+    '#!/bin/bash',
+    'MY_TTY=$(tty)',
+    '',
+    '_close_tab() {',
+    '  osascript <<CLOSESCRIPT',
+    'tell application "Terminal"',
+    '  repeat with w in windows',
+    '    repeat with t in tabs of w',
+    '      if tty of t is "$MY_TTY" then',
+    '        set selected of t to true',
+    '        set frontmost of w to true',
+    '      end if',
+    '    end repeat',
+    '  end repeat',
+    'end tell',
+    'delay 0.2',
+    'tell application "System Events" to keystroke "w" using {command down}',
+    'CLOSESCRIPT',
+    '}',
+    '',
+    // Pass API key as env var, not --password.
+    // --password expects a Theme Access token; Admin API tokens (shpat_...)
+    // cannot set the _shopify_essential cookie required for theme dev.
+    ...creds.SHOPIFY_API_KEY ? [`export SHOPIFY_API_KEY=${ creds.SHOPIFY_API_KEY }`] : [],
+    '',
+    `shopify theme dev --store ${ creds.STORE_URL }.myshopify.com --port ${ port } --live-reload full-page &`,
+    'THEME_PID=$!',
+    `echo $THEME_PID > ${ pf }`,
+    '',
+    `(while kill -0 ${ mainPid } 2>/dev/null; do sleep 1; done; kill $THEME_PID 2>/dev/null) &`,
+    'MONITOR_PID=$!',
+    '',
+    `trap 'kill $THEME_PID $MONITOR_PID 2>/dev/null; kill -USR1 ${ mainPid } 2>/dev/null; _close_tab' EXIT`,
+    '',
+    'wait $THEME_PID 2>/dev/null',
+  ].join('\n') + '\n';
 
-  return `${ prefix }shopify theme dev`
-    + ` --store ${ creds.STORE_URL }.myshopify.com`
-    + ` --port ${ port }`
-    + ` --live-reload full-page`
-    + `; exit`;
+  const scriptPath = path.join(os.tmpdir(), `shopivibe_${ storeId }.sh`);
+  fs.writeFileSync(scriptPath, script, { mode: 0o755 });
+  return scriptPath;
 }
 
 stores.forEach((id, i) => {
@@ -108,10 +151,12 @@ stores.forEach((id, i) => {
   const distDir = path.join(DIST, id);
   fs.mkdirSync(distDir, { recursive: true });
 
+  const scriptPath = writeTabScript(id, port);
+
   spawn('npx', [
     'ttab', '-t', `shopivibe ${ id }`,
     '-d', distDir,
-    themeDevCmd(id, port),
+    `exec bash ${ scriptPath }`,
   ], { stdio: 'inherit', cwd: ROOT });
 });
 
@@ -119,8 +164,26 @@ console.log(chalk.gray('Theme dev launched in separate tabs.'));
 
 // ── Cleanup ──
 
-process.on('SIGINT', () => {
+let exiting = false;
+
+function cleanup() {
+  if (exiting) return;
+  exiting = true;
+
   themeWatcher.close();
   viteWatcher.close();
+
+  for (const id of stores) {
+    const pf = pidFile(id);
+    try {
+      const pid = parseInt(fs.readFileSync(pf, 'utf8').trim());
+      process.kill(pid, 'SIGTERM');
+    } catch {}
+    try { fs.unlinkSync(pf); } catch {}
+  }
+
   process.exit(0);
-});
+}
+
+process.on('SIGINT', cleanup);
+process.on('SIGUSR1', cleanup);
