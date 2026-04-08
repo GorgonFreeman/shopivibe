@@ -13,8 +13,9 @@ function discoverEntries() {
 
   if (existsSync(scriptsDir)) {
     for (const f of readdirSync(scriptsDir)) {
-      if (f.endsWith('.js')) {
-        entries[f.replace(/\.js$/, '')] = resolve(scriptsDir, f);
+      const match = f.match(/\.(js|ts)$/);
+      if (match) {
+        entries[f.replace(/\.(js|ts)$/, '')] = resolve(scriptsDir, f);
       }
     }
   }
