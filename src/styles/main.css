@@ -21,6 +21,7 @@
 
 cart-item {
   display: block;
+  transition: transform 200ms ease;
 }
 
 cart-item._animate_out {

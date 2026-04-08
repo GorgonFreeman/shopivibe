@@ -35,7 +35,14 @@ class CartItem extends LitElement {
     console.log({ removeResponse });
 
     if (removeResponse.success) {
-      // If it worked, actually remove the element from the DOM
+      let sibling = itemEl.nextElementSibling;
+      while (sibling) {
+        if (sibling.matches('cart-item')) {
+          sibling.style.transition = 'none';
+          sibling.style.transform = '';
+        }
+        sibling = sibling.nextElementSibling;
+      }
       itemEl.remove();
     } else {
       // Otherwise, restore the element visually
