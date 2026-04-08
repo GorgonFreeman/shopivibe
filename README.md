@@ -50,20 +50,62 @@ For each Vite-built asset matching `snippets_*.js` or `sections_*.js`, find the 
 ### 5. Sync staging to dist
 Compare `staging/{store}/` against `dist/{store}/`. Only write files to dist that are new or have changed content. Delete files from dist that no longer exist in staging. This prevents unnecessary file writes, which matters because `shopify theme dev` watches dist and uploads every change.
 
-## Watch Process (`npm run w`)
+## Commands
 
-1. Run a full build (steps 1–5 above)
-2. Start chokidar watching `src/` and `regional/{store}/` for each selected store
-3. On file change/add/remove, re-run the full build (staging→diff→dist means only actual changes reach dist)
-4. Start `shopify theme dev` for each store in a separate terminal tab (macOS) or via concurrently (other OS), each on an incrementing port from 9292
+For all commands, first ask which stores to act on (if not defined in .env).
+
+### npm run build
+
+1. Run a full build per store
+
+### npm run watch
+
+1. Run a full build per store
+1. Start watching `src/` and `regional/{store}/` for each selected store
+1. On file change/add/remove, re-run the full build (staging→diff→dist means only actual changes reach dist)
+1. Start `shopify theme dev` for each store in a separate terminal tab (macOS) or via concurrently (other OS), each on an incrementing port from 9292
+
+### npm run deploy
+
+1. Run a full build per store
+1. Ask what to call the theme
+1. Upload new themes to each store from `dist/{store}`
+
+### npm run upload
+
+1. Run a full build per store
+1. For each store, ask which existing theme to target, and allow the user to choose with an interactive UI.
+1. Upload the sections and config/settings_schema.json first, then, upload the entire theme, replacing the one targeted.
+
+### npm run download
+
+1. Run a full build per store
+1. For each store, ask which existing theme to target, and allow the user to choose with an interactive UI.
+1. Download the theme to `staging/{store}` - this allows the download process to benefit from checksum skipping.
+1. Copy the files into `regional/{store}/...` if they are mentioned anywhere in the total list of all files in all regional directories, or otherwise, into `src`. Skip the `assets` folders to avoid dealing with built files. Remove the auto-inserted vite snippet lines. Skip a list of auto-generated files, such as the built translations file.
+1. Pause to allow the user to commit diffs for that store before moving onto the next store.
+1. Exit once all stores have been done.
+
+### npm run sync
+
+1. Same as `download`, but only download `config`, `locales` and `templates/*.json`, which are the user-configured settings.
+
+| Command             | Description                                                         | Aliases                 |
+| ------------------- | ------------------------------------------------------------------- | ----------------------- |
+| `npm run build`     | Full build for selected stores                                      | b                       |
+| `npm run watch`     | Build + watch + theme dev                                           | w                       |
+| `npm run deploy`    | Build + ask for theme name + upload as new themes                   | dep                     |
+| `npm run upload`    | Build + pick themes + upload schema + upload themes                 | u, up                   |
+| `npm run download`  | Build to staging + pick themes + download + move to src             | d, down, reconcile, rec |
+| `npm run sync`      | Build to staging + pick themes + download config only + move to src | s                       |
+
 
 ## Script Pairing Convention
 
 Snippets and sections are paired with scripts by naming convention:
 
 | Liquid file | Script file (any of these work) |
-|---|---|
-| `snippets/cart_item.liquid` | `src/scripts/snippets_cartItem.js` or `snippets_CartItem.js` or `snippets_cart_item.js` |
+|---|---|| `snippets/cart_item.liquid` | `src/scripts/snippets_cartItem.js` or `snippets_CartItem.js` or `snippets_cart_item.js` |
 | `sections/product.liquid` | `src/scripts/sections_product.js` or `sections_Product.js` |
 
 The build injects the `{% render 'vite' %}` call automatically. You just create the snippet and the script.
@@ -73,14 +115,6 @@ The build injects the `{% render 'vite' %}` call automatically. You just create 
 Locale files live in `src/locales/` (e.g. `en.default.json`, `fr.json`). The build generates `snippets/js_translations.liquid` which uses Liquid to output only the active locale's translations to `window.shopivibe.translations`.
 
 Included in layout via `{% render 'js_translations' %}`.
-
-## Commands
-
-| Command | Description |
-|---|---|
-| `npm run build` | Full build for selected stores |
-| `npm run w` | Build + watch + theme dev |
-| `npm run down` | Download theme |
 
 ## Credentials
 
