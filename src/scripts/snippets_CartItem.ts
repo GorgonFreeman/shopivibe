@@ -39,7 +39,8 @@ class CartItem extends LitElement {
       while (sibling) {
         if (sibling.matches('cart-item')) {
           sibling.style.transition = 'none';
-          sibling.style.transform = '';
+          const current = parseFloat(sibling.style.getPropertyValue('--offset')) || 0;
+          sibling.style.setProperty('--offset', `${ current + height }px`);
         }
         sibling = sibling.nextElementSibling;
       }

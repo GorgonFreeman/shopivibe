@@ -21,6 +21,7 @@
 
 cart-item {
   display: block;
+  transform: translateY(var(--offset, 0px));
   transition: transform 200ms ease;
 }
 

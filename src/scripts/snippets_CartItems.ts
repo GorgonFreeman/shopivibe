@@ -11,7 +11,8 @@ class CartItems extends LitElement {
       while (sibling) {
         if (sibling.matches('cart-item')) {
           sibling.classList.remove('_animate_in');
-          sibling.style.transform = `translateY(-${ height }px)`;
+          const current = parseFloat(sibling.style.getPropertyValue('--offset')) || 0;
+          sibling.style.setProperty('--offset', `${ current - height }px`);
         }
         sibling = sibling.nextElementSibling;
       }
