@@ -6,6 +6,7 @@ class BuyButton extends LitElement {
   createRenderRoot() { return this; }
 
   @query('a') anchor;
+  revertId = 0;
 
   firstUpdated() {
     this.anchor?.addEventListener('click', e => this.addToCartHandler(e));
@@ -16,6 +17,7 @@ class BuyButton extends LitElement {
     const variantId = new URL(this.anchor.href).searchParams.get('id');
     if (!variantId) return;
 
+    clearTimeout(this.revertId);
     this.anchor.textContent = t('products.adding');
 
     const [, response] = await Promise.all([
@@ -32,8 +34,9 @@ class BuyButton extends LitElement {
       ? t('products.added')
       : t('products.add_to_cart_error');
 
-    await wait(1000);
-    this.anchor.textContent = t('products.add_to_cart');
+    this.revertId = setTimeout(() => {
+      this.anchor.textContent = t('products.add_to_cart');
+    }, 1000);
   }
 }
 
