@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{ content_for_header }}
+    {%- capture captive_content_for_header -%}{{ content_for_header }}{%- endcapture -%}
     <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
   </head>
   <body>
