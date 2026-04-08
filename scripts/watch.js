@@ -99,7 +99,8 @@ function themeDevCmd(storeId, port) {
   return `${ prefix }shopify theme dev`
     + ` --store ${ creds.STORE_URL }.myshopify.com`
     + ` --port ${ port }`
-    + ` --live-reload full-page`;
+    + ` --live-reload full-page`
+    + `; exit`;
 }
 
 stores.forEach((id, i) => {
