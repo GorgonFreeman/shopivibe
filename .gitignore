@@ -1,4 +1,5 @@
 node_modules/
 dist/
+**/snippets/js_translations.liquid
 .creds.yml
 .vite/

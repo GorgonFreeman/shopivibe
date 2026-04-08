@@ -1,86 +1,103 @@
 # Build process — clarifications
 
-Answer inline (or below each section). These unblock a single coherent build pipeline that matches `README.md`.
+Questions and **decided answers** for the shopivibe build pipeline.
 
 ---
 
 ## Store selection and config
 
 1. **`.env` vs `.creds.yml`**  
-   The README says commands should use stores from **`.env`** if set, but **Credentials** only documents **`.creds.yml`**. Should **`STORES`** (and related vars) live only in `.env`, only in `.creds.yml`, or both—and if both, which wins?
+   **Q:** Should `STORES` (and related vars) live only in `.env`, only in `.creds.yml`, or both—and if both, which wins?  
+   **A:** The README reference to `.env` was a mistake. **Use `.creds.yml` for project store configuration** (not `.env`). `README.md` is updated accordingly.
 
 2. **Interactive prompt**  
-   When `STORES` is unset, should the prompt list **every key under `shopify:`** in `.creds.yml`, support **multi-select**, and is **“all stores”** a default or an explicit choice?
+   **Q:** List every key under `shopify:`? Multi-select? “All stores” option?  
+   **A:** **List all keys under `shopify:`.** There is **no “all stores”** option. **Interactive UI** for any choice uses **numbered options and highlighting.**
 
 3. **Missing `regional/{store}/`**  
-   If a store id has no `regional/{store}/` folder, is that **normal** (treat as empty), or should the build **warn** or **error**?
+   **Q:** Normal empty merge, warn, or error?  
+   **A:** **Create the directory automatically** if it does not exist.
 
 ---
 
 ## Layout and sync semantics
 
 4. **`staging/{store}/` vs a single staging dir**  
-   The README specifies **`staging/{store}/` per store**. An alternative is a single ephemeral staging directory (e.g. under `dist/`) cleared between stores. Do you want **literal `staging/{store}/` in the repo** (likely gitignored), or is **any** ephemeral “full theme before dist” directory acceptable as long as behaviour matches?
+   **Q:** Literal per-store `staging/{store}/` or ephemeral staging?  
+   **A:** **Does not matter** — ephemeral staging is fine (e.g. under `dist/` or a temp dir) as long as behaviour matches the pipeline.
 
 5. **Dist diff**  
-   For “only write changed files to `dist`,” is **byte-for-byte compare** enough, or do you need **normalisation** (e.g. line endings) to avoid false churn for Shopify / `theme dev`?
+   **Q:** Byte compare vs normalisation?  
+   **A:** **Byte-for-byte** is enough for now; can refine later.
 
 ---
 
 ## Vite and assets
 
 6. **CSS entries**  
-   Should **CSS** be pulled in only via **`main.js`** (and `@import` / Tailwind), or are there **multiple CSS entry points** under `src/styles/` that must be separate Rollup inputs?
+   **Q:** Only via `main.js` or multiple CSS entry points?  
+   **A:** **Multiple CSS entry points** — may live in JS (imports) or as **standalone CSS files** in `src/styles/`.
 
 7. **Hashed chunks vs stable names**  
-   Entries use stable `[name].js`, but shared chunks may be hashed. For **`{% render 'vite' with '…' %}`**, is the argument always the **logical entry name** (e.g. `snippets_CartItem`) resolved by a **snippet**, or must **every** script asset have a **stable, predictable filename** on disk after build?
+   **Q:** How should `{% render 'vite' with '…' %}` relate to hashed chunks?  
+   **A:** **Implementer discretion** — resolve in whatever way keeps the pipeline correct and maintainable.
 
 ---
 
 ## Liquid / `vite` snippet contract
 
 8. **Exact `render` API**  
-   Please confirm what **`vite.liquid`** (or equivalent) expects: **stem** of the JS entry, **full filename**, **asset URL**, etc.—whatever the build must emit.
+   **Q:** Stem, filename, or URL?  
+   **A:** **`render` should take the full filename** (e.g. including `.js`).
 
 9. **Prepend vs idempotent inject**  
-   Should vite inject lines **prepend once** and **skip** if already present (safe on rebuild), or **always rewrite** the top of the file?
+   **Q:** Skip if already present, or rewrite every time?  
+   **A:** **Rewrite every time.** Staging avoids mass redundant uploads to `dist` when paired with the diff step.
 
 ---
 
 ## Download / sync behaviour
 
 10. **“Mentioned in regional” rule**  
-    For moving downloaded files into `regional/{store}` vs `src`: does “mentioned anywhere in the total list of all files in all regional directories” mean **same relative path exists under any `regional/*/`**, a **maintained list**, or another rule?
+    **Q:** Same path under any `regional/*/`?  
+    **A:** **Assess dynamically** when needed. Example: if `regional/us/config/settings_data.json` exists, then when acting on store `uk`, the path `config/settings_data.json` is treated as a **regional** file (same relative path under another store’s `regional/` counts).
 
 11. **Auto-generated skip list**  
-    Besides **`snippets/js_translations.liquid`** and **vite inject lines**, what must **download** never overwrite or merge into `src` / `regional` (exact paths or naming rules)?
+    **Q:** What to skip on download besides translations / vite lines?  
+    **A:** **Ignore `js_translations.liquid`** — **gitignore it**; no separate skip list. On download, **remove auto-injected vite lines** only.
 
 12. **`sync` scope**  
-    README says **`config`**, **`locales`**, and **`templates/*.json`**. Confirm that excludes e.g. **`sections/*.json`**, **`templates/customers/*.json`**, or list every glob you want included.
+    **Q:** Confirm globs?  
+    **A:** **Only as stated in README:** `config`, `locales`, and `templates/*.json` (user-configured settings). Nothing beyond that scope.
 
 ---
 
 ## Shopify CLI / deploy / watch
 
 13. **`upload` / `deploy`**  
-    Preferred mechanism: **`shopify theme push`** (with which flags), **`theme package`**, or other? Any **hard rule** (e.g. never `--nodelete`, always `--nodelete`)?
+    **Q:** `theme push` flags? Hard rules?  
+    **A:** **Upload** should **replace the theme entirely** (no orphaned old files). **Deploy** is a **new theme**, so full replacement is not the same concern. **Implementer discretion** on exact CLI invocations.
 
 14. **`theme dev` path and ports**  
-    Confirm **`shopify theme dev`** uses **`dist/{store}`** as the theme root, **first port 9292**, then **9293, 9294, …** per store. Should the **base port** be configurable (env)?
+    **Q:** `dist/{store}`, ports 9292+? Configurable base port?  
+    **A:** **Yes** — `dist/{store}`, **9292, 9293, …** Do **not** make the base port configurable.
 
 15. **macOS `ttab` vs `concurrently`**  
-    Is **new Terminal/iTerm tabs** required on macOS, or is **concurrently in one terminal** acceptable?
+    **Q:** Tabs or single terminal?  
+    **A:** **New tabs are required** so each store can use a **separate UI**.
 
 ---
 
 ## npm scripts / aliases
 
 16. **README aliases (`b`, `w`, `dep`, …)**  
-    Should we add **duplicate `package.json` script entries** for each alias, skip aliases, or use a **small runner**—your preference?
+    **Q:** Duplicate scripts, skip, or runner?  
+    **A:** **Skip aliases for the moment.**
 
 ---
 
 ## Anything else
 
 17. **Free field**  
-    Constraints, “do not do X”, or dependencies on other tools not in `README.md`.
+    **Q:** Extra constraints?  
+    **A:** **None** — implement as appropriate.
