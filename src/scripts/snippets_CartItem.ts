@@ -21,6 +21,12 @@ class CartItem extends LitElement {
     itemEl.classList.remove('_animate_in');
     itemEl.classList.add('_animate_out');
 
+    const { height } = itemEl.getBoundingClientRect();
+    itemEl.dispatchEvent(new CustomEvent('cart-item:removed', {
+      bubbles: true,
+      detail: { height, itemEl },
+    }));
+
     // Use Promise.all to ensure this takes as long as the animation
     const [, removeResponse] = await Promise.all([
       wait(200),
