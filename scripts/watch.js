@@ -1,136 +1,123 @@
 #!/usr/bin/env node
 
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { build } from 'vite';
+import chokidar from 'chokidar';
+import { spawn } from 'child_process';
+import chalk from 'chalk';
+import {
+  ROOT, SRC, REGIONAL, DIST, VITE_OUT,
+  chooseStores, assembleStore, getStoreCreds, logAssembly,
+} from './lib.js';
 
-const { getStores, loadStoreCreds } = require('./lib/common');
-const { incrementalUpdate, runViteBuild, buildStore } = require('./build');
-const { ROOT, SRC_DIR, REGIONAL_DIR, DIST_BASE } = require('./constants');
+const stores = await chooseStores();
+console.log();
 
-function runBuild(stores) {
-  return new Promise((resolve, reject) => {
-    const child = spawn('node', [path.join(__dirname, 'build.js'), ...stores], {
-      stdio: 'inherit',
-      cwd: ROOT,
-    });
-    child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`build exited ${ code }`))));
+// ── Serialised assembly queue ──
+
+let queue = Promise.resolve();
+
+function enqueue(ids, label) {
+  queue = queue.then(() => {
+    console.log(chalk.gray(`[${ label }] assembling ${ ids.join(', ') }...`));
+    for (const id of ids) logAssembly(id, assembleStore(id));
   });
 }
 
-function getThemeDevCommand(storeId, distDir, port) {
-  const creds = loadStoreCreds(storeId);
-  const storeUrl = creds.STORE_URL || storeId;
-  const envPrefix = creds.SHOPIFY_API_KEY ? `SHOPIFY_API_KEY=${ creds.SHOPIFY_API_KEY } ` : '';
-  return `${ envPrefix }shopify theme dev --store ${ storeUrl } --port ${ port } --live-reload full-page`;
+// ── Vite watch (tracks full dependency graph including CSS @import) ──
+
+const viteWatcher = await build({ build: { watch: {} } });
+
+for (const id of stores) logAssembly(id, assembleStore(id));
+
+viteWatcher.on('event', (e) => {
+  if (e.code === 'BUNDLE_START') {
+    fs.rmSync(path.join(VITE_OUT, 'assets'), { recursive: true, force: true });
+  }
+  if (e.code === 'END') enqueue(stores, 'vite');
+  if (e.result) e.result.close();
+});
+
+// ── Theme file watch (liquid, json, locales — Vite owns scripts/styles) ──
+
+const scriptsDir = path.join(SRC, 'scripts');
+const stylesDir = path.join(SRC, 'styles');
+
+const watchPaths = [SRC];
+for (const id of stores) {
+  const dir = path.join(REGIONAL, id);
+  if (fs.existsSync(dir)) watchPaths.push(dir);
 }
 
-function getWatchPaths(stores) {
-  const paths = [SRC_DIR];
-  for (const storeId of stores) {
-    const regionalStore = path.join(REGIONAL_DIR, storeId);
-    if (fs.existsSync(regionalStore)) {
-      paths.push(regionalStore);
+const themeWatcher = chokidar.watch(watchPaths, {
+  ignored: (p) =>
+    p === scriptsDir || p.startsWith(`${ scriptsDir }/`) ||
+    p === stylesDir || p.startsWith(`${ stylesDir }/`),
+  ignoreInitial: true,
+  atomic: true,
+});
+
+let pending = new Set();
+let debounce;
+
+themeWatcher.on('all', (_, filePath) => {
+  const abs = path.resolve(filePath);
+
+  let regional = false;
+  for (const id of stores) {
+    if (abs.startsWith(path.join(REGIONAL, id))) {
+      pending.add(id);
+      regional = true;
+      break;
     }
   }
-  return paths;
+  if (!regional) for (const id of stores) pending.add(id);
+
+  clearTimeout(debounce);
+  debounce = setTimeout(() => {
+    const batch = [...pending];
+    pending = new Set();
+    enqueue(batch, 'theme');
+  }, 150);
+});
+
+themeWatcher.on('ready', () => console.log(chalk.gray('\n[watch] Watching for changes...\n')));
+
+// ── Launch shopify theme dev in separate tabs ──
+
+const BASE_PORT = 9292;
+
+function themeDevCmd(storeId, port) {
+  const creds = getStoreCreds(storeId);
+  const parts = [
+    'shopify', 'theme', 'dev',
+    '--store', `${ creds.STORE_URL }.myshopify.com`,
+    '--port', String(port),
+    '--live-reload', 'full-page',
+  ];
+  if (creds.SHOPIFY_API_KEY) parts.push('--password', creds.SHOPIFY_API_KEY);
+  return parts.join(' ');
 }
 
-async function main() {
-  const stores = await getStores();
-  console.log('Stores:', stores.join(', '));
+stores.forEach((id, i) => {
+  const port = BASE_PORT + i;
+  const distDir = path.join(DIST, id);
+  fs.mkdirSync(distDir, { recursive: true });
 
-  await runBuild(stores);
+  spawn('npx', [
+    'ttab', '-t', `shopivibe ${ id }`,
+    '-d', distDir,
+    themeDevCmd(id, port),
+  ], { stdio: 'inherit', cwd: ROOT });
+});
 
-  const chokidar = require('chokidar');
-  const watchPaths = getWatchPaths(stores);
+console.log(chalk.gray('Theme dev launched in separate tabs.'));
 
-  const watcher = chokidar.watch(watchPaths, {
-    ignored: /(^|[\/\\])\../,
-    persistent: true,
-    ignoreInitial: true,
-    atomic: true,
-  });
+// ── Cleanup ──
 
-  let buildInProgress = false;
-  let pendingPath = null;
-  let pendingEvent = null;
-
-  const runIncremental = async (event, filePath) => {
-    if (buildInProgress) {
-      pendingPath = filePath;
-      pendingEvent = event;
-      return;
-    }
-    buildInProgress = true;
-    try {
-      console.log(`[watch] ${ filePath } ${ event }, updating...`);
-      await incrementalUpdate(stores, filePath, event);
-    } catch (e) {
-      console.error('[watch] incremental failed, running full build:', e.message);
-      await runBuild(stores);
-    } finally {
-      buildInProgress = false;
-      if (pendingPath) {
-        const p = pendingPath;
-        const ev = pendingEvent;
-        pendingPath = null;
-        pendingEvent = null;
-        runIncremental(ev, p);
-      }
-    }
-  };
-
-  watcher.on('change', (filePath) => runIncremental('change', filePath));
-  watcher.on('add', (filePath) => runIncremental('add', filePath));
-  watcher.on('unlink', (filePath) => runIncremental('unlink', filePath));
-
-  watcher.on('ready', () => {
-    console.log('[watch] Watching:', watchPaths.join(', '));
-  });
-
-  const basePort = 9292;
-  const isMac = process.platform === 'darwin';
-
-  if (isMac) {
-    console.log('\nOpening theme dev for', stores.join(', '), 'in separate tabs...\n');
-    stores.forEach((storeId, i) => {
-      const distDir = path.join(DIST_BASE, storeId);
-      const port = basePort + i;
-      const cmd = getThemeDevCommand(storeId, distDir, port);
-      spawn('npx', ['ttab', '-t', `shopivibe ${ storeId }`, '-d', distDir, cmd], {
-        stdio: 'inherit',
-        cwd: ROOT,
-      });
-    });
-    console.log('File watcher running in this tab. Theme dev processes are in the new tabs.');
-  } else {
-    const concurrentArgs = ['-n', stores.join(','), '-c', 'cyan,magenta,green'];
-    stores.forEach((storeId, i) => {
-      const distDir = path.join(DIST_BASE, storeId);
-      const port = basePort + i;
-      const cmd = getThemeDevCommand(storeId, distDir, port);
-      concurrentArgs.push(`cd ${ path.relative(ROOT, distDir) } && ${ cmd }`);
-    });
-    console.log('\nStarting theme dev for', stores.join(', '), '(interactivity may be limited in one window)...\n');
-    const concurrent = spawn('npx', ['concurrently', ...concurrentArgs], {
-      stdio: 'inherit',
-      cwd: ROOT,
-    });
-    process.on('SIGINT', () => {
-      concurrent.kill('SIGINT');
-      watcher.close();
-      process.exit(0);
-    });
-  }
-
-  process.on('SIGINT', () => {
-    watcher.close();
-    process.exit(0);
-  });
-}
-
-main().catch((e) => {
-  console.error(e.message);
-  process.exit(1);
+process.on('SIGINT', () => {
+  themeWatcher.close();
+  viteWatcher.close();
+  process.exit(0);
 });

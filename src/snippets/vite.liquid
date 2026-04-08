@@ -1,6 +1,12 @@
 {% comment %}
-  Load a script as ES module. Browser deduplicates by URL.
-  {% render 'vite' with 'snippets_productTile' %}
+  Load a Vite-built asset as an ES module (JS) or stylesheet (CSS).
+  Usage:
+    {% render 'vite' with 'snippets_CartItem' %}
+    {% render 'vite' with 'main.css' %}
 {% endcomment %}
 {% assign entry = entry | default: vite %}
-<script type="module" src="{{ entry | append: '.js' | asset_url }}"></script>
+{% if entry contains '.css' %}
+  <link rel="stylesheet" href="{{ entry | asset_url }}">
+{% else %}
+  <script type="module" src="{{ entry | append: '.js' | asset_url }}"></script>
+{% endif %}

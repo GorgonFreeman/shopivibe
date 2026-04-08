@@ -1,50 +1,56 @@
-import { createRequire } from 'module';
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import { readdirSync } from 'fs';
+import { dirname, resolve } from 'path';
+import { readdirSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 import tailwindcss from '@tailwindcss/vite';
 
-const require = createRequire(import.meta.url);
-const { syncViteAssetsToDistStores } = require('./scripts/build.js');
+const root = dirname(fileURLToPath(import.meta.url));
+const scriptsDir = resolve(root, 'src/scripts');
+const stylesDir = resolve(root, 'src/styles');
 
-const scriptsDir = resolve(__dirname, 'src/scripts');
-const entries = { main: resolve(scriptsDir, 'main.js') };
+function discoverEntries() {
+  const entries = {};
 
-try {
-  for (const name of readdirSync(scriptsDir)) {
-    if (name !== 'main.js' && name.endsWith('.js')) {
-      entries[name.replace(/\.js$/, '')] = resolve(scriptsDir, name);
+  if (existsSync(scriptsDir)) {
+    for (const f of readdirSync(scriptsDir)) {
+      if (f.endsWith('.js')) {
+        entries[f.replace(/\.js$/, '')] = resolve(scriptsDir, f);
+      }
     }
   }
-} catch {
-  // src/scripts may not exist yet
-}
 
-/** After `vite build`, copy dist/_build/assets → dist/<each-store>/assets (theme dev uses store folders, not _build). */
-function shopivibeSyncDistAssets() {
-  return {
-    name: 'shopivibe-sync-dist-assets',
-    closeBundle() {
-      syncViteAssetsToDistStores();
-    },
-  };
+  // Standalone CSS entries — skipped when a JS entry already owns the name
+  // (e.g. main.js imports main.css, so main.css is not a separate entry)
+  if (existsSync(stylesDir)) {
+    for (const f of readdirSync(stylesDir)) {
+      if (!f.endsWith('.css')) continue;
+      const stem = f.replace(/\.css$/, '');
+      if (!entries[stem]) {
+        entries[stem] = resolve(stylesDir, f);
+      }
+    }
+  }
+
+  return entries;
 }
 
 export default defineConfig({
-  plugins: [tailwindcss(), shopivibeSyncDistAssets()],
-  oxc: {
-    decorators: { legacy: true },
-  },
+  plugins: [tailwindcss()],
   build: {
-    outDir: 'dist/_build',
+    outDir: resolve(root, 'dist/_build'),
     assetsDir: 'assets',
     emptyOutDir: true,
     rollupOptions: {
-      input: entries,
+      input: discoverEntries(),
       output: {
         entryFileNames: 'assets/[name].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name][extname]',
+        manualChunks(id) {
+          if (id.includes('node_modules/lit') || id.includes('node_modules/@lit')) {
+            return 'lit';
+          }
+        },
       },
     },
   },

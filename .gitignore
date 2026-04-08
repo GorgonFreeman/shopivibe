@@ -1,5 +1,6 @@
 node_modules/
 dist/
+staging/
 **/snippets/js_translations.liquid
 .creds.yml
 .vite/

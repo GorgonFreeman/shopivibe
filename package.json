@@ -12,10 +12,14 @@
   },
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
-  "main": "theme.liquid",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node scripts/build.js",
+    "watch": "node scripts/watch.js",
+    "deploy": "node scripts/deploy.js",
+    "upload": "node scripts/upload.js",
+    "download": "node scripts/download.js",
+    "sync": "node scripts/sync.js"
   },
   "devDependencies": {
     "@shopify/cli": "^3.78.0",
