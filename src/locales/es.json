@@ -5,6 +5,8 @@
     }
   },
   "products": {
-    "add_to_cart": "Añadir al carrito"
+    "add_to_cart": "Añadir al carrito",
+    "adding": "Añadiendo",
+    "added": "¡Añadido!"
   }
 }
