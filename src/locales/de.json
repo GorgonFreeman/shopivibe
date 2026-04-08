@@ -7,6 +7,7 @@
   "products": {
     "add_to_cart": "In den Warenkorb",
     "adding": "Wird hinzugefügt",
-    "added": "Hinzugefügt!"
+    "added": "Hinzugefügt!",
+    "add_to_cart_error": "Fehler"
   }
 }

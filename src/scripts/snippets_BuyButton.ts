@@ -18,15 +18,16 @@ class BuyButton extends LitElement {
 
     this.anchor.textContent = t('products.adding');
 
-    await customAxios('/cart/add.js', {
+    const response = await customAxios('/cart/add.js', {
       method: 'post',
       body: {
         items: [{ id: parseInt(variantId), quantity: 1 }],
       },
     });
 
-    this.anchor.textContent = t('products.added');
-    setTimeout(() => this.anchor.textContent = t('products.add_to_cart'), 1500);
+    this.anchor.textContent = response.success
+      ? t('products.added')
+      : t('products.add_to_cart_error');
   }
 }
 

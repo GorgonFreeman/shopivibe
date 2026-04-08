@@ -7,6 +7,7 @@
   "products": {
     "add_to_cart": "Ajouter au panier",
     "adding": "Ajout en cours",
-    "added": "Ajouté !"
+    "added": "Ajouté !",
+    "add_to_cart_error": "Erreur"
   }
 }
