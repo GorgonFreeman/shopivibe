@@ -15,11 +15,21 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.js",
+    "b": "npm run build",
     "watch": "node scripts/watch.js",
+    "w": "npm run watch",
     "deploy": "node scripts/deploy.js",
+    "dep": "npm run deploy",
     "upload": "node scripts/upload.js",
+    "u": "npm run upload",
+    "up": "npm run upload",
     "download": "node scripts/download.js",
-    "sync": "node scripts/sync.js"
+    "d": "npm run download",
+    "down": "npm run download",
+    "reconcile": "npm run download",
+    "rec": "npm run download",
+    "sync": "node scripts/sync.js",
+    "s": "npm run sync"
   },
   "devDependencies": {
     "@shopify/cli": "^3.78.0",
