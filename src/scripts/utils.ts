@@ -135,7 +135,11 @@ const customAxios = async (url, {
   }
 };
 
+const t = (path: string) =>
+  path.split('.').reduce((obj, key) => obj?.[key], window.shopivibe?.translations) ?? path;
+
 export { 
   wait,
   customAxios,
+  t,
 };

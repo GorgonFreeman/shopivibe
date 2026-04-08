@@ -1,8 +1,6 @@
 import { LitElement } from 'lit';
 import { query } from 'lit/decorators.js';
-import { customAxios } from './utils';
-
-const t = (key: string) => window.shopivibe?.translations?.products?.[key] ?? key;
+import { customAxios, t } from './utils';
 
 class BuyButton extends LitElement {
   createRenderRoot() { return this; }
@@ -18,7 +16,7 @@ class BuyButton extends LitElement {
     const variantId = new URL(this.anchor.href).searchParams.get('id');
     if (!variantId) return;
 
-    this.anchor.textContent = t('adding');
+    this.anchor.textContent = t('products.adding');
 
     await customAxios('/cart/add.js', {
       method: 'post',
@@ -27,8 +25,8 @@ class BuyButton extends LitElement {
       },
     });
 
-    this.anchor.textContent = t('added');
-    setTimeout(() => this.anchor.textContent = t('add_to_cart'), 1500);
+    this.anchor.textContent = t('products.added');
+    setTimeout(() => this.anchor.textContent = t('products.add_to_cart'), 1500);
   }
 }
 
