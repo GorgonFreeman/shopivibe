@@ -7,6 +7,7 @@ class BuyButton extends LitElement {
 
   @query('a') anchor;
   revertId = 0;
+  busy = false;
 
   firstUpdated() {
     this.anchor?.addEventListener('click', e => this.addToCartHandler(e));
@@ -14,10 +15,13 @@ class BuyButton extends LitElement {
 
   async addToCartHandler(e) {
     e.preventDefault();
+    if (this.busy) return;
     const variantId = new URL(this.anchor.href).searchParams.get('id');
     if (!variantId) return;
 
+    this.busy = true;
     clearTimeout(this.revertId);
+    this.anchor.setAttribute('disabled', '');
     this.anchor.textContent = t('products.adding');
 
     const [, response] = await Promise.all([
@@ -30,6 +34,8 @@ class BuyButton extends LitElement {
       }),
     ]);
 
+    this.busy = false;
+    this.anchor.removeAttribute('disabled');
     this.anchor.textContent = response.success
       ? t('products.added')
       : t('products.add_to_cart_error');
