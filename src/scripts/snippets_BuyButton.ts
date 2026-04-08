@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { query } from 'lit/decorators.js';
-import { customAxios, t } from './utils';
+import { customAxios, wait, t } from './utils';
 
 class BuyButton extends LitElement {
   createRenderRoot() { return this; }
@@ -18,12 +18,15 @@ class BuyButton extends LitElement {
 
     this.anchor.textContent = t('products.adding');
 
-    const response = await customAxios('/cart/add.js', {
-      method: 'post',
-      body: {
-        items: [{ id: parseInt(variantId), quantity: 1 }],
-      },
-    });
+    const [, response] = await Promise.all([
+      wait(500),
+      customAxios('/cart/add.js', {
+        method: 'post',
+        body: {
+          items: [{ id: parseInt(variantId), quantity: 1 }],
+        },
+      }),
+    ]);
 
     this.anchor.textContent = response.success
       ? t('products.added')
