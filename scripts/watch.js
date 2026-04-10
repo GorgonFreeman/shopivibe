@@ -5,7 +5,7 @@ import os from 'os';
 import path from 'path';
 import { build } from 'vite';
 import chokidar from 'chokidar';
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import chalk from 'chalk';
 import {
   ROOT, SRC, REGIONAL, DIST, VITE_OUT,
@@ -89,56 +89,36 @@ themeWatcher.on('ready', () => console.log(chalk.gray('\n[watch] Watching for ch
 
 const BASE_PORT = 9292;
 
-function pidFile(storeId) {
-  return path.join(os.tmpdir(), `shopivibe_${ storeId }.pid`);
+function killListenersOnPort(port) {
+  try {
+    execSync(
+      `lsof -ti :${ port } | xargs kill -TERM 2>/dev/null; true`,
+      { shell: true, stdio: 'ignore' },
+    );
+  } catch {}
 }
 
 function writeTabScript(storeId, port) {
   const creds = getStoreCreds(storeId);
   const mainPid = process.pid;
-  const pf = pidFile(storeId);
 
-  // Each tab script:
-  //  - captures its tty so it can close itself via AppleScript
-  //  - backgrounds shopify theme dev and writes its PID for the main process
-  //  - runs a monitor that kills theme dev when the main process exits
-  //  - on EXIT (any cause), signals the main process and closes the tab
+  // Foreground `shopify theme dev` only — no `&` / fg / PID file (those break the Ink TUI).
+  // When the watch parent exits, a side loop kills whatever is bound to this tab's port.
   const script = [
     '#!/bin/bash',
-    'MY_TTY=$(tty)',
-    '',
-    '_close_tab() {',
-    '  osascript <<CLOSESCRIPT',
-    'tell application "Terminal"',
-    '  repeat with w in windows',
-    '    repeat with t in tabs of w',
-    '      if tty of t is "$MY_TTY" then',
-    '        set selected of t to true',
-    '        set frontmost of w to true',
-    '      end if',
-    '    end repeat',
-    '  end repeat',
-    'end tell',
-    'delay 0.2',
-    'tell application "System Events" to keystroke "w" using {command down}',
-    'CLOSESCRIPT',
-    '}',
     '',
     // Pass API key as env var, not --password.
     // --password expects a Theme Access token; Admin API tokens (shpat_...)
     // cannot set the _shopify_essential cookie required for theme dev.
     ...creds.SHOPIFY_API_KEY ? [`export SHOPIFY_API_KEY=${ creds.SHOPIFY_API_KEY }`] : [],
     '',
-    `shopify theme dev --store ${ creds.STORE_URL }.myshopify.com --port ${ port } --live-reload full-page &`,
-    'THEME_PID=$!',
-    `echo $THEME_PID > ${ pf }`,
-    '',
-    `(while kill -0 ${ mainPid } 2>/dev/null; do sleep 1; done; kill $THEME_PID 2>/dev/null) &`,
+    `(while kill -0 ${ mainPid } 2>/dev/null; do sleep 1; done; lsof -ti :${ port } | xargs kill -TERM 2>/dev/null; true) &`,
     'MONITOR_PID=$!',
     '',
-    `trap 'kill $THEME_PID $MONITOR_PID 2>/dev/null; kill -USR1 ${ mainPid } 2>/dev/null; _close_tab' EXIT`,
+    `trap 'kill $MONITOR_PID 2>/dev/null; kill -USR1 ${ mainPid } 2>/dev/null' EXIT INT TERM`,
     '',
-    'wait $THEME_PID 2>/dev/null',
+    `shopify theme dev --store ${ creds.STORE_URL }.myshopify.com --port ${ port } --live-reload full-page`,
+    '',
   ].join('\n') + '\n';
 
   const scriptPath = path.join(os.tmpdir(), `shopivibe_${ storeId }.sh`);
@@ -173,14 +153,9 @@ function cleanup() {
   themeWatcher.close();
   viteWatcher.close();
 
-  for (const id of stores) {
-    const pf = pidFile(id);
-    try {
-      const pid = parseInt(fs.readFileSync(pf, 'utf8').trim());
-      process.kill(pid, 'SIGTERM');
-    } catch {}
-    try { fs.unlinkSync(pf); } catch {}
-  }
+  stores.forEach((_, i) => {
+    killListenersOnPort(BASE_PORT + i);
+  });
 
   process.exit(0);
 }
