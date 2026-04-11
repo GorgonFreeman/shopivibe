@@ -34,19 +34,20 @@ class CartItem extends LitElement {
     ]);
     console.log({ removeResponse });
 
-    if (removeResponse.success) {
-      let sibling = itemEl.nextElementSibling;
-      while (sibling) {
-        if (sibling.matches('cart-item')) {
-          sibling.style.transition = 'none';
-          const current = parseFloat(sibling.style.getPropertyValue('--offset')) || 0;
-          sibling.style.setProperty('--offset', `${ current + height }px`);
-        }
-        sibling = sibling.nextElementSibling;
+    let sibling = itemEl.nextElementSibling;
+    while (sibling) {
+      if (sibling.matches('cart-item')) {
+        sibling.style.transition = 'none';
+        const current = parseFloat(sibling.style.getPropertyValue('--offset')) || 0;
+        sibling.style.setProperty('--offset', `${ current + height }px`);
+        sibling.style.removeProperty('transition');
       }
+      sibling = sibling.nextElementSibling;
+    }
+
+    if (removeResponse.success) {
       itemEl.remove();
     } else {
-      // Otherwise, restore the element visually
       itemEl.classList.remove('_animate_out');
       console.error(removeResponse.error);
     }
