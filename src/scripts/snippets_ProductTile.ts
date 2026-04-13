@@ -1,5 +1,6 @@
 import { LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
+import { customFetch } from './utils';
 
 class ProductTile extends LitElement {
   createRenderRoot() { return this; }
@@ -22,7 +23,7 @@ class ProductTile extends LitElement {
     this.hydrate();
   }
 
-  hydrate() {
+  async hydrate() {
     console.log('Not rendered, hydrating');
 
     if (!this.product) {
@@ -32,7 +33,17 @@ class ProductTile extends LitElement {
       }
 
       // Fetch using handle
+      const productResponse = await customFetch(`/products/${ this.handle }.json`, {
+        method: 'get',
+      });
 
+      console.log({ productResponse });
+      this.product = productResponse?.result?.product;
+    }
+
+    if (!this.product) {
+      console.error('Unable to fetch product');
+      return;
     }
 
     console.log({ product: this.product });
@@ -40,11 +51,16 @@ class ProductTile extends LitElement {
     const {
       title,
       url,
-      featured_image: featuredImage,
+      image: featuredImage,
     } = this.product;
 
+    const {
+      src: featuredImageSrc,
+      alt: featuredImageAlt,
+    } = featuredImage;
+
     this.renderRoot.innerHTML = `
-      <img src="${ featuredImage }" alt="${ title }">
+      <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }">
       <a href="${ url }">${ title }</a>
       <buy-button product="${ this.product }"></buy-button>
     `;

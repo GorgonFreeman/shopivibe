@@ -1,6 +1,9 @@
 <product-tile
-  {% if product %}data-rendered{% endif %}
-  data-product="{{ product | json | escape }}"
+  {% if product %}
+    data-rendered
+    data-product="{{ product | json | escape }}"
+  {% endif %}
+  {% if handle %}data-handle="{{ handle }}"{% endif %}
 >
   {% if product %}
     {% if product.featured_image != blank %}

@@ -1,6 +1,6 @@
 {% paginate collection.products by 10 %}
   {% for product in collection.products %}
-    {% render 'product_tile', product: product %}
+    {% render 'product_tile', handle: product.handle %}
   {% endfor %}
 
   {{ paginate | default_pagination }}
