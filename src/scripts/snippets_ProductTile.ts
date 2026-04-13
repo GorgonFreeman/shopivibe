@@ -19,6 +19,10 @@ class ProductTile extends LitElement {
       return;
     }
 
+    this.hydrate();
+  }
+
+  hydrate() {
     console.log('Not rendered, hydrating');
 
     if (!this.product) {
@@ -28,6 +32,7 @@ class ProductTile extends LitElement {
       }
 
       // Fetch using handle
+
     }
 
     console.log({ product: this.product });
