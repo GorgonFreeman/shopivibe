@@ -27,8 +27,12 @@ class CollectionProducts extends LitElement {
       console.log({ nextPageResponse });
 
       const nextPageProducts = nextPageResponse?.result;
-
       
+      const html = nextPageProducts.map(product => `<product-tile data-product="${ JSON.stringify(product) }"></product-tile>`).join('');
+      const lastProductTile = this.renderRoot.querySelector('product-tile:last-of-type');
+      lastProductTile?.insertAdjacentHTML('afterend', html);
+
+      this.page++;
     });
   }
 }
