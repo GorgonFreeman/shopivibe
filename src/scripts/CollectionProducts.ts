@@ -2,6 +2,20 @@ import { LitElement } from 'lit';
 import { query } from 'lit/decorators.js';
 import { customFetch, liquidEscape } from './utils';
 
+const collectionProductToExpectedShape = (product) => {
+
+  const {
+    media,
+  } = product;
+
+  const image = media.find((m) => m.media_type === 'image');
+
+  return {
+    ...product,
+    image,
+  };
+};
+
 class CollectionProducts extends LitElement {
   createRenderRoot() { return this; }
  
@@ -30,16 +44,7 @@ class CollectionProducts extends LitElement {
       
       const html = nextPageProducts
         .map((product) => {
-
-          const {
-            media,
-          } = product;
-          const image = media.find((m) => m.media_type === 'image');
-
-          const productJson = JSON.stringify({
-            ...product,
-            image,
-          });
+          const productJson = JSON.stringify(collectionProductToExpectedShape(product));
           return `<product-tile data-product="${ liquidEscape(productJson) }"></product-tile>`;
         })
         .join('');
