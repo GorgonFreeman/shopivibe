@@ -1,7 +1,7 @@
 {% paginate collection.products by 10 %}
   <collection-products>
     {% for product in collection.products %}
-      {% render 'product_tile', handle: product.handle %}
+      {% render 'product_tile', product: product %}
     {% endfor %}
     <button data-ref="loadMoreButton">load more</button>
   </collection-products>
