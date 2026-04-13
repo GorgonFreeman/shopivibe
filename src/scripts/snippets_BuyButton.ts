@@ -1,16 +1,38 @@
 import { LitElement } from 'lit';
-import { query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { customFetch, wait, t } from './utils';
 
 class BuyButton extends LitElement {
   createRenderRoot() { return this; }
 
-  @query('a') anchor;
+  @query('[data-ref="anchor"]') anchor;
   revertId = 0;
   busy = false;
 
+  @property({ type: Boolean, attribute: 'data-rendered' })
+  rendered = false;
+
+  @property({ type: String, attribute: 'data-id' })
+  variantId?: string;
+
   firstUpdated() {
+    if (this.rendered) {
+      return;
+    }
+
+    if (!this.variantId) {
+      console.error('No variant ID provided');
+      return;
+    }
+
+    this.hydrate();
+
     this.anchor?.addEventListener('click', e => this.addToCartHandler(e));
+  }
+
+  hydrate() {
+    this.renderRoot.innerHTML = `<a data-ref="anchor" href="/cart/add?id=${ this.variantId }">${ t('products.add_to_cart') }</a>`;
+    this.anchor = this.querySelector('[data-ref="anchor"]');
   }
 
   async addToCartHandler(e) {
