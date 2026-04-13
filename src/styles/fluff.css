@@ -8,3 +8,11 @@ cart-item {
   margin: 5px;
   padding: 15px;
 }
+
+product-tile {
+  display: inline-block;
+  background-color: var(--wfpink);
+  border-radius: 15px;
+  padding: 10px;
+  margin: 10px;
+}
