@@ -57,7 +57,7 @@ class ProductTile extends LitElement {
     const {
       src: featuredImageSrc,
       alt: featuredImageAlt,
-    } = featuredImage;
+    } = featuredImage || {};
 
     this.renderRoot.innerHTML = `
       <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }">
