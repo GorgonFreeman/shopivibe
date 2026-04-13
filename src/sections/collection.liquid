@@ -3,6 +3,7 @@
     {% for product in collection.products %}
       {% render 'product_tile', handle: product.handle %}
     {% endfor %}
+    <button data-ref="loadMoreButton">load more</button>
   </collection-products>
 
   {{ paginate | default_pagination }}
