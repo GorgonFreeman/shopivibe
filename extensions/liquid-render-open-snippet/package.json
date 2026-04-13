@@ -1,0 +1,29 @@
+{
+  "name": "liquid-render-open-snippet",
+  "displayName": "Liquid render → snippet",
+  "description": "Double-click the snippet name in {% render '...' %} or use Go to Definition (F12 / Cmd+Click) to open the matching snippets/*.liquid file.",
+  "version": "0.0.1",
+  "publisher": "shopivibe",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:liquid",
+    "onLanguage:liquid-html",
+    "workspaceContains:**/*.liquid"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.7.0"
+  }
+}
