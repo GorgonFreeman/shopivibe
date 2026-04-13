@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { query } from 'lit/decorators.js';
-import { customFetch } from './utils';
+import { customFetch, liquidEscape } from './utils';
 
 class CollectionProducts extends LitElement {
   createRenderRoot() { return this; }
@@ -28,7 +28,12 @@ class CollectionProducts extends LitElement {
 
       const nextPageProducts = nextPageResponse?.result;
       
-      const html = nextPageProducts.map(product => `<product-tile data-product="${ JSON.stringify(product) }"></product-tile>`).join('');
+      const html = nextPageProducts
+        .map((product) => {
+          const productJson = JSON.stringify(product);
+          return `<product-tile data-product="${ liquidEscape(productJson) }"></product-tile>`;
+        })
+        .join('');
       const lastProductTile = this.renderRoot.querySelector('product-tile:last-of-type');
       lastProductTile?.insertAdjacentHTML('afterend', html);
 

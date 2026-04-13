@@ -74,8 +74,17 @@ const customFetch = async (url, {
 const t = (path: string) =>
   path.split('.').reduce((obj, key) => obj?.[key], window.shopivibe?.translations) ?? path;
 
+/** Same as Liquid `| escape` (HTML-safe for attributes and text). */
+const liquidEscape = (value: unknown) =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
 export {
   wait,
   customFetch,
   t,
+  liquidEscape,
 };
