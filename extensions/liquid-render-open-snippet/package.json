@@ -1,8 +1,8 @@
 {
   "name": "liquid-render-open-snippet",
   "displayName": "Liquid render → snippet",
-  "description": "Double-click the snippet name in {% render '...' %} or use Go to Definition (F12 / Cmd+Click) to open the matching snippets/*.liquid file.",
-  "version": "0.0.1",
+  "description": "Highlights quoted snippet names in {% render '...' %} with a small link-out icon (visual only). Cmd+Click / F12 (Go to Definition) or the command opens snippets/*.liquid.",
+  "version": "0.0.4",
   "publisher": "shopivibe",
   "engines": {
     "vscode": "^1.85.0"
@@ -13,9 +13,18 @@
   "activationEvents": [
     "onLanguage:liquid",
     "onLanguage:liquid-html",
+    "onCommand:shopivibe.liquid-render-open-snippet.openAtCursor",
     "workspaceContains:**/*.liquid"
   ],
   "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "shopivibe.liquid-render-open-snippet.openAtCursor",
+        "title": "Open Liquid render snippet at cursor"
+      }
+    ]
+  },
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
