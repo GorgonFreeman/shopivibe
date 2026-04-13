@@ -10,7 +10,8 @@ cart-item {
 }
 
 product-tile {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
   background-color: var(--wfpink);
   border-radius: 15px;
   padding: 10px;

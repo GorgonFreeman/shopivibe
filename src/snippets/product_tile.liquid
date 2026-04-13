@@ -6,6 +6,9 @@
         alt="{{ product.featured_image.alt | escape }}"
       >
     {% endif %}
+    <a href="{{ product.url }}">
+      {{ product.title }}
+    </a>
     {% render 'buy_button', product: product %}
   {% else %}
     Not through Liquid - hydrate with JS
