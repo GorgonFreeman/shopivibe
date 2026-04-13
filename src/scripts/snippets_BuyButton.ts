@@ -6,6 +6,7 @@ class BuyButton extends LitElement {
   createRenderRoot() { return this; }
 
   @query('[data-ref="anchor"]') anchor;
+
   revertId = 0;
   busy = false;
 
@@ -16,6 +17,11 @@ class BuyButton extends LitElement {
   variantId?: string;
 
   firstUpdated() {
+    this.hydrate();
+    this.anchor?.addEventListener('click', e => this.addToCartHandler(e));
+  }
+
+  hydrate() {
     if (this.rendered) {
       return;
     }
@@ -25,14 +31,7 @@ class BuyButton extends LitElement {
       return;
     }
 
-    this.hydrate();
-
-    this.anchor?.addEventListener('click', e => this.addToCartHandler(e));
-  }
-
-  hydrate() {
-    this.renderRoot.innerHTML = `<a data-ref="anchor" href="/cart/add?id=${ this.variantId }">${ t('products.add_to_cart') }</a>`;
-    this.anchor = this.querySelector('[data-ref="anchor"]');
+    this.innerHTML = `<a data-ref="anchor" href="/cart/add?id=${ this.variantId }">${ t('products.add_to_cart') }</a>`;
   }
 
   async addToCartHandler(e) {
