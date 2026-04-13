@@ -30,10 +30,20 @@ class CollectionProducts extends LitElement {
       
       const html = nextPageProducts
         .map((product) => {
-          const productJson = JSON.stringify(product);
+
+          const {
+            media,
+          } = product;
+          const image = media.find((m) => m.media_type === 'image');
+
+          const productJson = JSON.stringify({
+            ...product,
+            image,
+          });
           return `<product-tile data-product="${ liquidEscape(productJson) }"></product-tile>`;
         })
         .join('');
+        
       const lastProductTile = this.renderRoot.querySelector('product-tile:last-of-type');
       lastProductTile?.insertAdjacentHTML('afterend', html);
 
