@@ -1,4 +1,4 @@
-{% paginate collection.products by 10 %}
+{% paginate collection.products by 50 %}
   <collection-products>
     {% for product in collection.products %}
       {% render 'product_tile', product: product %}
