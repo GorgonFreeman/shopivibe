@@ -1,3 +1,6 @@
-<buy-button>
+<buy-button 
+  {% if product %}data-rendered{% endif %} 
+  data-id="{{ product.selected_or_first_available_variant.id }}"
+>
   <a href="/cart/add?id={{ product.selected_or_first_available_variant.id }}">{{ 'products.add_to_cart' | t }}</a>
 </buy-button> 
