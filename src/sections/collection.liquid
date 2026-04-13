@@ -1,13 +1,6 @@
-{{ collection | json }}
-
 {% paginate collection.products by 10 %}
   {% for product in collection.products %}
-    <div>
-      <a href="{{ product.url }}" target="_blank">
-        {{ product.title }}
-      </a>
-      {% render 'buy_button', product: product %}
-    </div>
+    {% render 'product_tile', product: product %}
   {% endfor %}
 
   {{ paginate | default_pagination }}

@@ -1,0 +1,13 @@
+<product-tile>
+  {% if product %}
+    {% if product.featured_image != blank %}
+      <img
+        src="{{ product.featured_image | image_url: width: 600 }}"
+        alt="{{ product.featured_image.alt | escape }}"
+      >
+    {% endif %}
+    {% render 'buy_button', product: product %}
+  {% else %}
+    Not through Liquid - hydrate with JS
+  {% endif %}
+</product-tile>
