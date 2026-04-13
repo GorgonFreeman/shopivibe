@@ -1,4 +1,4 @@
-<product-tile>
+<product-tile data-product="{{ product | json }}">
   {% if product %}
     {% if product.featured_image != blank %}
       <img
