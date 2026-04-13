@@ -1,6 +1,6 @@
 <product-tile
   {% if product %}data-rendered{% endif %}
-  data-product="{{ product | json }}"
+  data-product="{{ product | json | escape }}"
 >
   {% if product %}
     {% if product.featured_image != blank %}
@@ -15,5 +15,6 @@
     {% render 'buy_button', product: product %}
   {% else %}
     Not through Liquid - hydrate with JS
+    TODO: Render skeleton
   {% endif %}
 </product-tile>
