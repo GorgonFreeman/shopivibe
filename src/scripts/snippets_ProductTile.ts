@@ -16,7 +16,6 @@ class ProductTile extends LitElement {
 
   firstUpdated() {
     if (this.rendered) {
-      console.log('Already rendered');
       return;
     }
 
@@ -24,7 +23,6 @@ class ProductTile extends LitElement {
   }
 
   async hydrate() {
-    console.log('Not rendered, hydrating');
 
     if (!this.product) {
       if (!this.handle) {
@@ -37,7 +35,6 @@ class ProductTile extends LitElement {
         method: 'get',
       });
 
-      console.log({ productResponse });
       this.product = productResponse?.result?.product;
     }
 
@@ -46,7 +43,7 @@ class ProductTile extends LitElement {
       return;
     }
 
-    console.log({ product: this.product });
+    // console.log({ product: this.product });
 
     const {
       title,
