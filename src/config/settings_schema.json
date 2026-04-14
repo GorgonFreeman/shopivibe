@@ -6,5 +6,16 @@
     "theme_author": "John",
     "theme_documentation_url": "https://THEME_DOCUMENTATION_URL.com/",
     "theme_support_url": "https://THEME_SUPPORT_URL.com/"
+  },
+  {
+    "name": "Collection",
+    "settings": [
+      {
+        "type": "number",
+        "id": "collection_products_per_page",
+        "label": "Products per page",
+        "default": 48
+      }
+    ]
   }
 ]
