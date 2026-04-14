@@ -1,12 +1,13 @@
 {% paginate collection.products by 50 %}
-  <collection-products>
-    {% for product in collection.products %}
-      {% render 'product_tile', product: product %}
-    {% endfor %}
+  <collection-display>
+    <collection-products>
+      {% for product in collection.products %}
+        {% render 'product_tile', product: product %}
+      {% endfor %}
+    </collection-products>
     <button data-ref="loadMoreButton">load more</button>
-  </collection-products>
-
-  {{ paginate | default_pagination }}
+    {{ paginate | default_pagination }}
+  </collection-display>
 {% endpaginate %}
 
 {% schema %}
