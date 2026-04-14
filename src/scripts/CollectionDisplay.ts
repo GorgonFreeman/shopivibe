@@ -4,11 +4,13 @@ import { customFetch } from './utils';
 class CollectionDisplay extends LitElement {
   createRenderRoot() { return this; }
 
-  // TODO: Get page from url params and update it ongoing
-  page = 1;
+  page;
 
   connectedCallback() {
     super.connectedCallback();
+    
+    const pageFromUrl = new URLSearchParams(window.location.search).get('page');
+    this.page = Number(pageFromUrl) || 1;
 
     const loadMoreButton = this.querySelector('[data-ref="loadMoreButton"]');
     loadMoreButton?.addEventListener('click', this.handleLoadMore);
@@ -45,6 +47,9 @@ class CollectionDisplay extends LitElement {
     lastProductTile?.insertAdjacentHTML('afterend', html);
 
     this.page++;
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', this.page);
+    history.replaceState(null, '', url);
   };
 }
 
