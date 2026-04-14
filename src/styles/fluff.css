@@ -1,5 +1,6 @@
 :root {
   --wfpink: #f8baca;
+  --skelly_colour: silver;
 }
 
 cart-item {
@@ -15,10 +16,11 @@ product-tile {
   background-color: var(--wfpink);
   border-radius: 15px;
   padding: 10px;
+  --skelly_colour: white;
 }
 
 product-tile img {
-  background: silver;
+  background: var(--skelly_colour);
   aspect-ratio: 300 / 460;
   animation: waver 2s infinite;
 }
