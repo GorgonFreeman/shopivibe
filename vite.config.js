@@ -37,6 +37,9 @@ function discoverEntries() {
 
 export default defineConfig({
   plugins: [tailwindcss()],
+  esbuild: {
+    minifyIdentifiers: false,
+  },
   build: {
     outDir: resolve(root, 'dist/_build'),
     assetsDir: 'assets',
