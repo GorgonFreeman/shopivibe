@@ -19,6 +19,18 @@
   }
 }
 
+@keyframes waver {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 cart-item {
   display: block;
   transform: translateY(var(--offset, 0px));

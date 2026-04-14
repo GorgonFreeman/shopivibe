@@ -10,6 +10,7 @@
       <img
         src="{{ product.featured_image | image_url: width: 300 }}"
         alt="{{ product.featured_image.alt | escape }}"
+        onload="(el => { el.classList.add('_loaded'); })(this)"
       >
     {% endif %}
     <a href="{{ product.url }}">

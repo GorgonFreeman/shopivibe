@@ -17,6 +17,16 @@ product-tile {
   padding: 10px;
 }
 
+product-tile img {
+  background: silver;
+  aspect-ratio: 300 / 460;
+  animation: waver 2s infinite;
+}
+
+product-tile img._loaded {
+  animation: none;
+}
+
 collection-products {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

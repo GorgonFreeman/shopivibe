@@ -61,7 +61,7 @@ class ProductTile extends LitElement {
     const selectedOrFirstAvailableVariant = variants.find((v) => v.available) || variants[0];
 
     this.renderRoot.innerHTML = `
-      <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }">
+      <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }" onload="(el => { el.classList.add('_loaded'); })(this)">
       <a href="${ url }">${ title }</a>
       <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
     `;
