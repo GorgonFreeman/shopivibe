@@ -5,6 +5,7 @@ const customFetch = async (url, {
   headers = {},
   params,
   body,
+  responseType = 'json',
 
   verbose,
   omitRequestId = false,
@@ -39,12 +40,12 @@ const customFetch = async (url, {
       if (response.ok) {
         return {
           success: true,
-          result: await response.json(),
+          result: await response[responseType](),
         };
       }
 
       const { status } = response;
-      const data = await response.json().catch(() => null);
+      const data = await response[responseType]().catch(() => null);
       verbose && console.error(status, data);
 
       if (retryStatuses.has(status)) {

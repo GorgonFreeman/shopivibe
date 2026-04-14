@@ -1,19 +1,5 @@
 import { LitElement } from 'lit';
-import { customFetch, liquidEscape } from './utils';
-
-const collectionProductToExpectedShape = (product) => {
-
-  const {
-    media,
-  } = product;
-
-  const image = media.find((m) => m.media_type === 'image');
-
-  return {
-    ...product,
-    image,
-  };
-};
+import { customFetch } from './utils';
 
 class CollectionDisplay extends LitElement {
   createRenderRoot() { return this; }
@@ -39,22 +25,20 @@ class CollectionDisplay extends LitElement {
 
     const nextPageResponse = await customFetch(window.location.href, {
       method: 'get',
+      responseType: 'text',
       params: {
         page: this.page + 1,
-        view: 'nolayout.products_json',
+        view: 'nolayout.products_html',
       },
     });
 
     console.log('nextPageResponse', nextPageResponse);
 
-    const nextPageProducts = nextPageResponse?.result;
+    const html = nextPageResponse?.result;
 
-    const html = nextPageProducts
-      .map((product) => {
-        const productJson = JSON.stringify(collectionProductToExpectedShape(product));
-        return `<product-tile data-product="${ liquidEscape(productJson) }"></product-tile>`;
-      })
-      .join('');
+    if (typeof html !== 'string' || !html.trim()) {
+      return;
+    }
 
     const productsEl = this.querySelector('collection-products');
     const lastProductTile = productsEl?.querySelector('product-tile:last-of-type');
