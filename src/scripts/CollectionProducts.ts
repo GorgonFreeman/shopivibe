@@ -1,6 +1,8 @@
 import { LitElement } from 'lit';
 import './snippets_CustomModal';
 
+type CustomModalEl = HTMLElement & LitElement;
+
 class CollectionProducts extends LitElement {
   createRenderRoot() { return this; }
 
@@ -14,7 +16,7 @@ class CollectionProducts extends LitElement {
     this.removeEventListener('click', this.handleTileClick);
   }
 
-  handleTileClick = (event: MouseEvent) => {
+  handleTileClick = async (event: MouseEvent) => {
     const target = event.target as Element;
 
     if (target.closest('buy-button')) {
@@ -29,8 +31,15 @@ class CollectionProducts extends LitElement {
     }
 
     event.preventDefault();
-    // Open a modal with the product display inside
-    return;
+
+    const modal = document.createElement('custom-modal') as CustomModalEl;
+
+    modal.setAttribute('data-self-destruct', '');
+    modal.setAttribute('data-open', '');
+    modal.textContent = 'banana split';
+
+    document.body.appendChild(modal);
+    await modal.updateComplete;
   };
 }
 
