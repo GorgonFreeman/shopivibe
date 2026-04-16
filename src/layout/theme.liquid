@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
   </head>
   <body>
+    <dialog id="exampleDialog"></dialog>
+    <button onclick="document.getElementById('exampleDialog').showModal()">Open Dialog</button>
     {% render 'lit_example' %}
     {{ content_for_layout }}
     {% render 'js_translations' %}
