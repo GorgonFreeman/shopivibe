@@ -59,7 +59,11 @@ class ProductModalContent extends LitElement {
     }
 
     this.innerHTML = `
-      <img src="${ featuredImageSrc }" onload="(el => { el.classList.add('_loaded'); })(this)">
+      <img 
+        src="${ featuredImageSrc }" 
+        class="_product_image_skelly"
+        onload="(el => { el.classList.add('_loaded'); })(this)"
+      ">
       <a href="${ url }">${ title }</a>
       <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
     `;

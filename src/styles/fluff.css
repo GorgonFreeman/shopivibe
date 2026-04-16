@@ -19,13 +19,13 @@ product-tile {
   --skelly_colour: white;
 }
 
-product-tile img {
+img._product_image_skelly {
   background: var(--skelly_colour);
   aspect-ratio: 300 / 460;
   animation: waver 2s infinite;
 }
 
-product-tile img._loaded {
+img._product_image_skelly._loaded {
   animation: none;
 }
 
