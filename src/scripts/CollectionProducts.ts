@@ -22,7 +22,14 @@ class CollectionProducts extends LitElement {
     }
 
     console.log('handleTileClick', target);
+    const parentTile = target.closest('product-tile');
+
+    if (!parentTile || !this.contains(parentTile)) {
+      return;
+    }
+
     event.preventDefault();
+    // Open a modal with the product display inside
     return;
   };
 }
