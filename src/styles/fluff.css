@@ -29,12 +29,6 @@ img._product_image_skelly._loaded {
   animation: none;
 }
 
-collection-products {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
 product-modal-content {
   display: block;
   max-width: 300px;

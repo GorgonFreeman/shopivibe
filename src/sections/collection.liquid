@@ -1,6 +1,6 @@
 {% paginate collection.products by settings.collection_products_per_page %}
   <collection-display>
-    <collection-products>
+    <collection-products class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
       {% for product in collection.products %}
         {% render 'product_tile', product: product %}
       {% endfor %}
