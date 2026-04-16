@@ -12,6 +12,10 @@ class CustomModal extends LitElement {
 
     this.dialogEl?.addEventListener('close', () => {
       this.open = false;
+
+      if (this.hasAttribute('data-self-destruct')) {
+        this.remove();
+      }
     });
 
     this.dialogEl?.addEventListener('click', e => {
