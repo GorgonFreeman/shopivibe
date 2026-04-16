@@ -19,6 +19,10 @@ console.log();
 
 let queue = Promise.resolve();
 
+// While Vite has deleted dist/_build/assets and not yet finished writing, a theme-only
+// assemble would copy an empty/partial assets tree into dist/<store>. Skip until END.
+let viteRebuilding = false;
+
 function enqueue(ids, label) {
   queue = queue.then(() => {
     console.log(chalk.gray(`[${ label }] assembling ${ ids.join(', ') }...`));
@@ -34,9 +38,14 @@ for (const id of stores) logAssembly(id, assembleStore(id));
 
 viteWatcher.on('event', (e) => {
   if (e.code === 'BUNDLE_START') {
+    viteRebuilding = true;
     fs.rmSync(path.join(VITE_OUT, 'assets'), { recursive: true, force: true });
   }
-  if (e.code === 'END') enqueue(stores, 'vite');
+  if (e.code === 'END') {
+    viteRebuilding = false;
+    enqueue(stores, 'vite');
+  }
+  if (e.code === 'ERROR') viteRebuilding = false;
   if (e.result) e.result.close();
 });
 
@@ -79,6 +88,7 @@ themeWatcher.on('all', (_, filePath) => {
   debounce = setTimeout(() => {
     const batch = [...pending];
     pending = new Set();
+    if (viteRebuilding) return;
     enqueue(batch, 'theme');
   }, 150);
 });
