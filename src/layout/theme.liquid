@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
   </head>
   <body>
-    <dialog id="exampleDialog"></dialog>
-    <button onclick="document.getElementById('exampleDialog').showModal()">Open Dialog</button>
+    {% render 'custom_modal', id: 'exampleModal', content: 'Holy smokes!' %}
+    <button onclick="document.getElementById('exampleModal').showModal()">Open Modal</button>
     {% render 'lit_example' %}
     {{ content_for_layout }}
     {% render 'js_translations' %}
