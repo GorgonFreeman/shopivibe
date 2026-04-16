@@ -17,6 +17,10 @@ class CollectionProducts extends LitElement {
   handleTileClick = (event: MouseEvent) => {
     const target = event.target as Element;
 
+    if (event.target.closest('buy-button')) {
+      return;
+    }
+
     console.log('handleTileClick', target);
     event.preventDefault();
     return;
