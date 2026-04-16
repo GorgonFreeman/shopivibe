@@ -1,5 +1,6 @@
 import { LitElement } from 'lit';
 import './snippets_CustomModal';
+import './ProductModalContent';
 
 type CustomModalEl = HTMLElement & LitElement;
 
@@ -23,7 +24,6 @@ class CollectionProducts extends LitElement {
       return;
     }
 
-    console.log('handleTileClick', target);
     const parentTile = target.closest('product-tile');
 
     if (!parentTile || !this.contains(parentTile)) {
@@ -32,11 +32,28 @@ class CollectionProducts extends LitElement {
 
     event.preventDefault();
 
+    const productJson = parentTile.getAttribute('data-product');
+    const handle = parentTile.getAttribute('data-handle');
+
+    if (!productJson && !handle) {
+      console.error('collectionProducts', 'product-tile missing data-product and data-handle');
+      return;
+    }
+
     const modal = document.createElement('custom-modal') as CustomModalEl;
 
     modal.setAttribute('data-self-destruct', '');
     modal.setAttribute('data-open', '');
-    modal.textContent = 'banana split';
+
+    const modalContent = document.createElement('product-modal-content');
+
+    if (productJson) {
+      modalContent.setAttribute('data-product', productJson);
+    } else if (handle) {
+      modalContent.setAttribute('data-handle', handle);
+    }
+
+    modal.appendChild(modalContent);
 
     document.body.appendChild(modal);
     await modal.updateComplete;

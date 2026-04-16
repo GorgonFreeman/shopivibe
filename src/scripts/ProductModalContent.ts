@@ -46,13 +46,9 @@ class ProductModalContent extends LitElement {
     const {
       title,
       url,
-      image: featuredImage,
+      featured_image: featuredImageSrc,
       variants,
     } = this.product;
-
-    const img = featuredImage as { src?: string; alt?: string } | undefined;
-    const featuredImageSrc = img?.src;
-    const featuredImageAlt = img?.alt;
 
     const variantList = variants as Array<{ available?: boolean; id: string | number }> | undefined;
     const selectedOrFirstAvailableVariant = variantList?.find((v) => v.available) || variantList?.[0];
@@ -63,7 +59,7 @@ class ProductModalContent extends LitElement {
     }
 
     this.innerHTML = `
-      <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }" onload="(el => { el.classList.add('_loaded'); })(this)">
+      <img src="${ featuredImageSrc }" onload="(el => { el.classList.add('_loaded'); })(this)">
       <a href="${ url }">${ title }</a>
       <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
     `;
