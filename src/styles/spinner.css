@@ -1,0 +1,19 @@
+@keyframes spin {
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+custom-spinner {
+  display: inline-block;
+  --size: 1rem;
+  width: var(--size);
+  height: var(--size);
+  border: calc(var(--size) / 4) solid #eee;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

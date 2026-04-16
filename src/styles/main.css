@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './fluff';
+@import './spinner';
 
 @keyframes fade_out {
   from {

@@ -1,7 +1,6 @@
 class CustomSpinner extends HTMLElement {
   constructor() {
     super();
-    this.innerHTML = 'spinner';
   }
 }
 
