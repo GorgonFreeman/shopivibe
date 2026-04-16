@@ -56,4 +56,4 @@ class CustomModal extends LitElement {
   }
 }
 
-customElements.define('custom-modal', CustomModal);
+customElements.get('custom-modal') || customElements.define('custom-modal', CustomModal);

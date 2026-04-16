@@ -20,4 +20,4 @@ class CartItems extends LitElement {
   }
 }
 
-customElements.define('cart-items', CartItems);
+customElements.get('cart-items') || customElements.define('cart-items', CartItems);

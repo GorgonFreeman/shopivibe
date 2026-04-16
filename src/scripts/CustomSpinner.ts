@@ -4,4 +4,4 @@ class CustomSpinner extends HTMLElement {
   }
 }
 
-customElements.define('custom-spinner', CustomSpinner);
+customElements.get('custom-spinner') || customElements.define('custom-spinner', CustomSpinner);

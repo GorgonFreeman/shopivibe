@@ -68,4 +68,4 @@ class ProductTile extends LitElement {
   }
 }
 
-customElements.define('product-tile', ProductTile);
+customElements.get('product-tile') || customElements.define('product-tile', ProductTile);

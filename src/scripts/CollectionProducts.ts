@@ -4,4 +4,4 @@ class CollectionProducts extends LitElement {
   createRenderRoot() { return this; }
 }
 
-customElements.define('collection-products', CollectionProducts);
+customElements.get('collection-products') || customElements.define('collection-products', CollectionProducts);

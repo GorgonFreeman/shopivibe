@@ -67,4 +67,4 @@ class BuyButton extends LitElement {
   }
 }
 
-customElements.define('buy-button', BuyButton);
+customElements.get('buy-button') || customElements.define('buy-button', BuyButton);

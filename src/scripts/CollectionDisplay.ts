@@ -71,4 +71,4 @@ class CollectionDisplay extends LitElement {
   };
 }
 
-customElements.define('collection-display', CollectionDisplay);
+customElements.get('collection-display') || customElements.define('collection-display', CollectionDisplay);

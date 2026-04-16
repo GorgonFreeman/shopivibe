@@ -6,4 +6,4 @@ class LitExample extends LitElement {
   }
 }
 
-customElements.define('lit-example', LitExample);
+customElements.get('lit-example') || customElements.define('lit-example', LitExample);
