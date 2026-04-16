@@ -5,7 +5,7 @@ class CustomModal extends LitElement {
   @query('dialog', true)
   dialogEl!: HTMLDialogElement;
 
-  @property({ type: Boolean, reflect: true })
+  @property({ type: Boolean, attribute: 'data-open', reflect: true })
   open = false;
 
   firstUpdated() {
