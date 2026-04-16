@@ -34,3 +34,8 @@ collection-products {
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
+
+product-modal-content {
+  display: block;
+  max-width: 300px;
+}
