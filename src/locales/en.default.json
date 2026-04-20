@@ -9,5 +9,10 @@
     "adding": "Adding",
     "added": "Added!",
     "add_to_cart_error": "Error"
+  },
+  "sections": {
+    "recommendations": {
+      "heading": "You may also like"
+    }
   }
 }

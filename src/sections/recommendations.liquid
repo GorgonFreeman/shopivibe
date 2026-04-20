@@ -1,8 +1,118 @@
-{{ recommendations | json }}
+{% liquid
+  assign products = section.settings.products
+  assign heading = section.settings.heading | strip
+  if heading == blank
+    assign heading = 'sections.recommendations.heading' | t
+  endif
+%}
+
+<section
+  class="recommendations-section"
+  {% if heading != blank %}
+    aria-labelledby="recommendations-heading-{{ section.id }}"
+  {% else %}
+    aria-label="Product recommendations"
+  {% endif %}
+>
+  {% if heading != blank %}
+    <h2 class="recommendations-section__heading" id="recommendations-heading-{{ section.id }}">
+      {{ heading }}
+    </h2>
+  {% endif %}
+
+  {% if products != blank %}
+    <div
+      class="recommendations-carousel"
+      data-carousel
+    >
+      <div
+        class="recommendations-carousel__track"
+        data-carousel-track
+        role="list"
+      >
+        {% for product in products %}
+          <div class="recommendations-carousel__slide" role="listitem">
+            {% render 'product_tile', product: product %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="recommendations-carousel__nav">
+        <button
+          type="button"
+          class="recommendations-carousel__btn"
+          aria-label="Previous products"
+          data-carousel-prev
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          class="recommendations-carousel__btn"
+          aria-label="Next products"
+          data-carousel-next
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  {% elsif request.design_mode %}
+    <p class="recommendations-section__empty">Select products in the section settings.</p>
+  {% endif %}
+
+  <script>
+  (function () {
+    var root = document.currentScript && document.currentScript.closest('.recommendations-section');
+    if (!root || !root.querySelector) {
+      return;
+    }
+    var track = root.querySelector('[data-carousel-track]');
+    var prev = root.querySelector('[data-carousel-prev]');
+    var next = root.querySelector('[data-carousel-next]');
+    if (!track || !prev || !next) {
+      return;
+    }
+    function slideWidth() {
+      var slide = track.querySelector('.recommendations-carousel__slide');
+      if (!slide) {
+        return Math.min(320, track.clientWidth * 0.85);
+      }
+      var rect = slide.getBoundingClientRect();
+      var styles = window.getComputedStyle(track);
+      var gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+      return rect.width + gap;
+    }
+    prev.addEventListener('click', function () {
+      track.scrollBy({ left: -slideWidth(), behavior: 'smooth' });
+    });
+    next.addEventListener('click', function () {
+      track.scrollBy({ left: slideWidth(), behavior: 'smooth' });
+    });
+  })();
+  </script>
+</section>
 
 {% schema %}
   {
     "name": "Recommendations",
-    "settings": []
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "{{ 'sections.recommendations.heading' | t }}"
+      },
+      {
+        "type": "product_list",
+        "id": "products",
+        "label": "Products",
+        "limit": 24
+      }
+    ],
+    "presets": [
+      {
+        "name": "Recommendations"
+      }
+    ]
   }
 {% endschema %}
