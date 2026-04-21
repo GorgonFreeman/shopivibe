@@ -340,10 +340,11 @@ export function shopifyExec(args) {
 
 export function shopifySpawn(args, opts = {}) {
   return new Promise((resolve, reject) => {
+    // Do not use shell: true — it string-joins argv without quoting, so theme names
+    // with spaces (e.g. --theme Something wicked) break into extra CLI arguments.
     const child = nodeSpawn('npx', ['shopify', ...args], {
       cwd: ROOT,
       stdio: 'inherit',
-      shell: true,
       ...opts,
     });
     child.on('close', code => code === 0
