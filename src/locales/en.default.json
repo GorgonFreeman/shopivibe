@@ -12,7 +12,12 @@
   },
   "sections": {
     "recommendations": {
-      "heading": "You may also like"
+      "heading_related": "You may also like",
+      "heading_complementary": "Pairs well with",
+      "carousel_aria": "Product recommendations",
+      "previous": "Previous products",
+      "next": "Next products",
+      "no_product_context": "Product recommendations load here when this section is on a product page (there is no current product on the home page)."
     }
   }
 }

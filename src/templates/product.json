@@ -3,7 +3,11 @@
     "main": {
       "type": "product",
       "settings": {}
+    },
+    "recommendations": {
+      "type": "recommendations",
+      "settings": {}
     }
   },
-  "order": ["main"]
+  "order": ["main", "recommendations"]
 }

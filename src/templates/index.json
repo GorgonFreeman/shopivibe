@@ -3,14 +3,7 @@
     "main": {
       "type": "index",
       "settings": {}
-    },
-    "recommendations": {
-      "type": "recommendations",
-      "settings": {
-        "heading": "",
-        "products": []
-      }
     }
   },
-  "order": ["main", "recommendations"]
+  "order": ["main"]
 }
