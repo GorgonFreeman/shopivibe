@@ -11,6 +11,28 @@ class CollectionDisplay extends LitElement {
   page;
   busy = false;
 
+  private loadMoreObserver?: IntersectionObserver;
+
+  private observeForLoadMore() {
+    this.loadMoreObserver?.disconnect();
+
+    const productsEl = this.querySelector('collection-products');
+    const tiles = productsEl?.querySelectorAll('product-tile');
+    if (!tiles?.length) {
+      return;
+    }
+
+    const index = tiles.length >= 5 ? tiles.length - 5 : tiles.length - 1;
+    const target = tiles[index]!;
+
+    this.loadMoreObserver = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting) && !this.busy) {
+        void this.handleLoadMore();
+      }
+    });
+    this.loadMoreObserver.observe(target);
+  }
+
   connectedCallback() {
     super.connectedCallback();
     
@@ -18,11 +40,13 @@ class CollectionDisplay extends LitElement {
     this.page = Number(pageFromUrl) || 1;
 
     this.loadMoreButton?.addEventListener('click', this.handleLoadMore);
+    queueMicrotask(() => this.observeForLoadMore());
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
+    this.loadMoreObserver?.disconnect();
     this.loadMoreButton?.removeEventListener('click', this.handleLoadMore);
   }
 
@@ -63,6 +87,8 @@ class CollectionDisplay extends LitElement {
       const url = new URL(window.location.href);
       url.searchParams.set('page', this.page);
       history.replaceState(null, '', url);
+
+      this.observeForLoadMore();
     } finally {
       this.busy = false;
       loadMoreButton.disabled = false;
