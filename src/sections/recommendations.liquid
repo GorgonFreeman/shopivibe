@@ -93,7 +93,7 @@
     gap: 1rem;
     overflow-x: auto;
     scroll-snap-type: x proximity;
-    scroll-padding-inline: 0.5rem;
+    scroll-padding-inline: 2.75rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     padding-bottom: 0.25rem;
@@ -106,6 +106,14 @@
     scroll-margin-inline: 0.5rem;
   }
 
+  .recommendations-carousel__slide:first-child {
+    scroll-margin-inline-start: 2.75rem;
+  }
+
+  .recommendations-carousel__slide:last-child {
+    scroll-margin-inline-end: 2.75rem;
+  }
+
   .recommendations-carousel__slide product-tile {
     display: flex;
     flex-direction: column;
@@ -113,30 +121,43 @@
   }
 
   .recommendations-carousel__nav {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
     display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.35rem;
+    pointer-events: none;
   }
 
   .recommendations-carousel__btn {
+    pointer-events: auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 2.25rem;
-    min-height: 2.25rem;
-    padding: 0 0.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: 0;
     border-radius: 9999px;
-    border: 1px solid #ccc;
-    background: #fff;
-    font-size: 1.25rem;
+    border: 1px solid rgb(0 0 0 / 12%);
+    background: rgb(255 255 255 / 92%);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+    font-size: 1.35rem;
     line-height: 1;
     cursor: pointer;
+    color: #222;
   }
 
   .recommendations-carousel__btn:hover {
-    border-color: #999;
-    background: #fafafa;
+    border-color: rgb(0 0 0 / 22%);
+    background: #fff;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 14%);
+  }
+
+  .recommendations-carousel__btn:focus-visible {
+    outline: 2px solid #222;
+    outline-offset: 2px;
   }
 {% endstylesheet %}
 
