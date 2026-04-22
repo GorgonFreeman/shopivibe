@@ -124,11 +124,21 @@
     position: absolute;
     inset: 0;
     z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0.35rem;
     pointer-events: none;
+  }
+
+  .recommendations-carousel__btn[data-carousel-prev] {
+    position: absolute;
+    left: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .recommendations-carousel__btn[data-carousel-next] {
+    position: absolute;
+    right: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .recommendations-carousel__btn {
@@ -199,6 +209,18 @@
       controlIndex = indexClosestToScrollLeft();
     }
 
+    function updateNavVisibility() {
+      var items = slides();
+      var len = items.length;
+      if (!len) {
+        prevBtn.hidden = true;
+        nextBtn.hidden = true;
+        return;
+      }
+      prevBtn.hidden = controlIndex <= 0;
+      nextBtn.hidden = controlIndex >= len - 1;
+    }
+
     function goToIndex(i) {
       var items = slides();
       if (!items.length) {
@@ -217,6 +239,7 @@
       } else {
         window.setTimeout(restoreSnap, 320);
       }
+      updateNavVisibility();
     }
 
     track.addEventListener(
@@ -228,12 +251,14 @@
         scrollSyncTimer = window.setTimeout(function () {
           scrollSyncTimer = null;
           syncControlIndexFromScroll();
+          updateNavVisibility();
         }, 60);
       },
       { passive: true },
     );
 
     syncControlIndexFromScroll();
+    updateNavVisibility();
 
     prevBtn.onclick = function () {
       goToIndex(controlIndex - 1);
