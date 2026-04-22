@@ -80,17 +80,34 @@
 </section>
 
 {% stylesheet %}
+  .recommendations-section {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-x: clip;
+    box-sizing: border-box;
+  }
+
   .product-recommendations {
     min-height: 1px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .recommendations-carousel {
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .recommendations-carousel__track {
     display: flex;
     gap: 1rem;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
     scroll-snap-type: x proximity;
     scroll-padding-inline-start: 2.75rem;
@@ -102,7 +119,7 @@
   }
 
   .recommendations-carousel__slide {
-    flex: 0 0 min(85vw, 18rem);
+    flex: 0 0 min(85%, 18rem);
     scroll-snap-align: start;
     scroll-margin-inline-start: 0;
     scroll-margin-inline-end: 0;
@@ -188,6 +205,7 @@
 
     var controlIndex = 0;
     var scrollSyncTimer = null;
+    var scrollStepSlides = 3;
 
     function indexClosestToScrollLeft() {
       var items = slides();
@@ -256,11 +274,11 @@
     updateNavVisibility();
 
     prevBtn.onclick = function () {
-      goToIndex(controlIndex - 1);
+      goToIndex(controlIndex - scrollStepSlides);
     };
 
     nextBtn.onclick = function () {
-      goToIndex(controlIndex + 1);
+      goToIndex(controlIndex + scrollStepSlides);
     };
   }
 
