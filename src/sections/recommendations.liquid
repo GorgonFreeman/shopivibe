@@ -29,7 +29,7 @@
       data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ limit }}&intent={{ intent }}"
     {% endif %}
   >
-    {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    {%- if recommendations.performed? and recommendations.products_count > 0 -%}
       <div
         class="recommendations-carousel"
         data-carousel
@@ -105,17 +105,34 @@
     };
   }
 
-  var sectionEl = document.currentScript && document.currentScript.closest('.shopify-section');
-  var productRecommendationsSection =
-    sectionEl && sectionEl.querySelector('.product-recommendations');
+  function parseRecommendationsFromResponse(text) {
+    var doc = new DOMParser().parseFromString(text, 'text/html');
+    var fromDoc = doc.querySelector('.product-recommendations');
+    if (fromDoc) {
+      return fromDoc;
+    }
+    var wrap = doc.querySelector('[id^="shopify-section-"]');
+    if (wrap) {
+      return wrap.querySelector('.product-recommendations');
+    }
+    var fallback = document.createElement('div');
+    fallback.innerHTML = text;
+    return fallback.querySelector('.product-recommendations');
+  }
 
-  if (productRecommendationsSection) {
-    bindRecommendationsCarousel(productRecommendationsSection);
+  function initLazyRecommendations(productRecommendationsSection) {
+    if (!productRecommendationsSection || productRecommendationsSection.dataset.recommendationsInit === 'true') {
+      return;
+    }
 
     var url = productRecommendationsSection.dataset.url;
     if (!url) {
       return;
     }
+
+    productRecommendationsSection.dataset.recommendationsInit = 'true';
+
+    bindRecommendationsCarousel(productRecommendationsSection);
 
     var handleIntersection = function (entries, observer) {
       if (!entries[0].isIntersecting) {
@@ -128,9 +145,7 @@
           return response.text();
         })
         .then(function (text) {
-          var html = document.createElement('div');
-          html.innerHTML = text;
-          var recommendations = html.querySelector('.product-recommendations');
+          var recommendations = parseRecommendationsFromResponse(text);
 
           if (recommendations && recommendations.innerHTML.trim().length > 0) {
             productRecommendationsSection.innerHTML = recommendations.innerHTML;
@@ -150,6 +165,10 @@
 
     observer.observe(productRecommendationsSection);
   }
+
+  document.querySelectorAll('.recommendations-section .product-recommendations').forEach(function (el) {
+    initLazyRecommendations(el);
+  });
 {% endjavascript %}
 
 {% schema %}
