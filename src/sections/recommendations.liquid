@@ -1,5 +1,11 @@
 {% liquid
-  assign limit = 4
+  assign limit = section.settings.limit | default: 10
+  if limit > 10
+    assign limit = 10
+  endif
+  if limit < 4
+    assign limit = 4
+  endif
   assign intent = 'related'
 %}
 
@@ -137,26 +143,83 @@
 {% javascript %}
   function bindRecommendationsCarousel(container) {
     var track = container.querySelector('[data-carousel-track]');
-    var prev = container.querySelector('[data-carousel-prev]');
-    var next = container.querySelector('[data-carousel-next]');
-    if (!track || !prev || !next) {
+    var prevBtn = container.querySelector('[data-carousel-prev]');
+    var nextBtn = container.querySelector('[data-carousel-next]');
+    if (!track || !prevBtn || !nextBtn) {
       return;
     }
-    function slideWidth() {
-      var slide = track.querySelector('.recommendations-carousel__slide');
-      if (!slide) {
-        return Math.min(320, track.clientWidth * 0.85);
-      }
-      var rect = slide.getBoundingClientRect();
-      var styles = window.getComputedStyle(track);
-      var gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
-      return rect.width + gap;
+
+    function slides() {
+      return Array.prototype.slice.call(track.querySelectorAll('.recommendations-carousel__slide'));
     }
-    prev.onclick = function () {
-      track.scrollBy({ left: -slideWidth(), behavior: 'smooth' });
+
+    var controlIndex = 0;
+    var scrollSyncTimer = null;
+
+    function indexClosestToScrollLeft() {
+      var items = slides();
+      if (!items.length) {
+        return 0;
+      }
+      var x = track.scrollLeft;
+      var best = 0;
+      var bestDist = Infinity;
+      for (var i = 0; i < items.length; i++) {
+        var d = Math.abs(items[i].offsetLeft - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      }
+      return best;
+    }
+
+    function syncControlIndexFromScroll() {
+      controlIndex = indexClosestToScrollLeft();
+    }
+
+    function goToIndex(i) {
+      var items = slides();
+      if (!items.length) {
+        return;
+      }
+      var clamped = Math.max(0, Math.min(items.length - 1, i));
+      controlIndex = clamped;
+      var wasSnap = track.style.scrollSnapType;
+      track.style.scrollSnapType = 'none';
+      track.scrollTo({ left: items[clamped].offsetLeft, behavior: 'smooth' });
+      function restoreSnap() {
+        track.style.scrollSnapType = wasSnap || '';
+      }
+      if ('onscrollend' in track) {
+        track.addEventListener('scrollend', restoreSnap, { once: true });
+      } else {
+        window.setTimeout(restoreSnap, 320);
+      }
+    }
+
+    track.addEventListener(
+      'scroll',
+      function () {
+        if (scrollSyncTimer) {
+          window.clearTimeout(scrollSyncTimer);
+        }
+        scrollSyncTimer = window.setTimeout(function () {
+          scrollSyncTimer = null;
+          syncControlIndexFromScroll();
+        }, 60);
+      },
+      { passive: true },
+    );
+
+    syncControlIndexFromScroll();
+
+    prevBtn.onclick = function () {
+      goToIndex(controlIndex - 1);
     };
-    next.onclick = function () {
-      track.scrollBy({ left: slideWidth(), behavior: 'smooth' });
+
+    nextBtn.onclick = function () {
+      goToIndex(controlIndex + 1);
     };
   }
 
@@ -187,7 +250,9 @@
 
     productRecommendationsSection.dataset.recommendationsInit = 'true';
 
-    bindRecommendationsCarousel(productRecommendationsSection);
+    if (productRecommendationsSection.querySelector('[data-carousel-track]')) {
+      bindRecommendationsCarousel(productRecommendationsSection);
+    }
 
     var handleIntersection = function (entries, observer) {
       if (!entries[0].isIntersecting) {
@@ -204,7 +269,11 @@
 
           if (recommendations && recommendations.innerHTML.trim().length > 0) {
             productRecommendationsSection.innerHTML = recommendations.innerHTML;
-            bindRecommendationsCarousel(productRecommendationsSection);
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () {
+                bindRecommendationsCarousel(productRecommendationsSection);
+              });
+            });
           } else {
             productRecommendationsSection.innerHTML = '';
           }
@@ -229,7 +298,18 @@
 {% schema %}
   {
     "name": "Recommendations",
-    "settings": [],
+    "settings": [
+      {
+        "type": "range",
+        "id": "limit",
+        "min": 4,
+        "max": 10,
+        "step": 1,
+        "default": 10,
+        "label": "Number of recommendations",
+        "info": "Shopify returns at most 10 related products."
+      }
+    ],
     "presets": [
       {
         "name": "Recommendations"

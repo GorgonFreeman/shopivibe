@@ -6,7 +6,9 @@
     },
     "recommendations": {
       "type": "recommendations",
-      "settings": {}
+      "settings": {
+        "limit": 10
+      }
     }
   },
   "order": ["main", "recommendations"]
