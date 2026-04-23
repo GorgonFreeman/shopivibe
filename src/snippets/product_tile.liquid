@@ -4,6 +4,7 @@
     data-product="{{ product | json | escape }}"
   {% endif %}
   {% if handle %}data-handle="{{ handle }}"{% endif %}
+  {% if index %}data-index="{{ index }}"{% endif %}
 >
   {% if product %}
     {% if product.featured_image != blank %}
