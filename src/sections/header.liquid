@@ -3,7 +3,9 @@
     href="{{ routes.root_url }}"
     class="mx-auto"
   >{{ shop.name }}</a>
-  {% render 'cart_icon', count: cart.item_count %}
+  <a href="/cart">
+    {% render 'cart_icon', count: cart.item_count %}
+  </a>
 </header>
 
 {% schema %}
