@@ -5,9 +5,11 @@
 
 cart-item {
   background-color: var(--wfpink);
-  border-radius: 15px;
-  margin: 5px;
-  padding: 15px;
+  border-radius: 1rem;
+  margin: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 product-tile {
