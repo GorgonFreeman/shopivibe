@@ -5,16 +5,25 @@ class CartItems extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('cart-item:removed', (e: CustomEvent) => {
-      const { height, itemEl } = e.detail;
-      let sibling = itemEl.nextElementSibling;
-      while (sibling) {
-        if (sibling.matches('cart-item')) {
-          sibling.classList.remove('_animate_in');
-          const current = parseFloat(sibling.style.getPropertyValue('--offset')) || 0;
-          sibling.style.setProperty('--offset', `${ current - height }px`);
+    this.addEventListener('cart-item:removed', (e) => {
+      const itemEl = e.target;
+      if (!(itemEl instanceof HTMLElement) || !itemEl.matches('cart-item')) {
+        return;
+      }
+      let node = itemEl.nextElementSibling;
+      while (node) {
+        if (node.matches('cart-item')) {
+          const nextCart = node;
+          nextCart.classList.remove('_animate_in');
+          nextCart.classList.add('_shift_up_pretend');
+          nextCart.addEventListener('animationend', (ev) => {
+            if (ev.animationName !== 'shift_up_pretend' || ev.target !== nextCart) {
+              return;
+            }
+            nextCart.classList.remove('_shift_up_pretend');
+          }, { once: true, });
         }
-        sibling = sibling.nextElementSibling;
+        node = node.nextElementSibling;
       }
     });
   }

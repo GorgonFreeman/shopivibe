@@ -21,11 +21,7 @@ class CartItem extends LitElement {
     itemEl.classList.remove('_animate_in');
     itemEl.classList.add('_animate_out');
 
-    const { height } = itemEl.getBoundingClientRect();
-    itemEl.dispatchEvent(new CustomEvent('cart-item:removed', {
-      bubbles: true,
-      detail: { height, itemEl },
-    }));
+    itemEl.dispatchEvent(new CustomEvent('cart-item:removed', { bubbles: true, }));
 
     // Use Promise.all to ensure this takes as long as the animation
     const [, removeResponse] = await Promise.all([
@@ -33,17 +29,6 @@ class CartItem extends LitElement {
       this.removeItem(itemId),
     ]);
     console.log({ removeResponse });
-
-    let sibling = itemEl.nextElementSibling;
-    while (sibling) {
-      if (sibling.matches('cart-item')) {
-        sibling.style.transition = 'none';
-        const current = parseFloat(sibling.style.getPropertyValue('--offset')) || 0;
-        sibling.style.setProperty('--offset', `${ current + height }px`);
-        sibling.style.removeProperty('transition');
-      }
-      sibling = sibling.nextElementSibling;
-    }
 
     if (removeResponse.success) {
       itemEl.remove();

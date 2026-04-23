@@ -47,3 +47,23 @@ collection-products product-tile {
   animation-delay: calc(var(--index) * var(--animation_delay_increment));
 } 
 */
+
+/* Opacity only — layout holds steady until the step collapse runs. */
+@keyframes fade_out_and_collapse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes shift_up_pretend {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

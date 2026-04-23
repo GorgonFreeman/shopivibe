@@ -3,15 +3,6 @@
 @import './spinner';
 @import './header';
 
-@keyframes fade_out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 @keyframes dunk_in {
   0% { /* Use with animation-fill-mode: backwards for the element to be hidden before animating - jumps to 0% state */
     opacity: 0;
@@ -45,12 +36,29 @@
 }
 
 cart-item {
-  transform: translateY(var(--offset, 0px));
+  transform: translateY(calc(var(--offset, 0px) - max(0px, 5px * sign(var(--offset, 0px)))));
   transition: transform 200ms ease;
 }
 
+/* Collapse is a 0s animation after 200ms — no height/margin/padding curve. */
+@keyframes cart_item_collapse_step {
+  to {
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+
 cart-item._animate_out {
-  animation: fade_out 200ms ease-out forwards;
+  min-height: 0;
+  overflow: hidden;
+  animation:
+    fade_out_and_collapse 200ms ease-out forwards,
+    cart_item_collapse_step 0s linear 200ms forwards;
+}
+
+cart-item._shift_up_pretend {
+  animation: shift_up_pretend 200ms ease-out both;
 }
 
 cart-item._animate_in {
