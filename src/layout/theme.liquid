@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
   </head>
   <body>
+    {% sections 'header_group' %}
     {% render 'custom_modal', id: 'exampleModal', content: 'Holy smokes!' %}
     <button onclick="document.getElementById('exampleModal').showModal()">Open Modal</button>
     {% render 'lit_example' %}
