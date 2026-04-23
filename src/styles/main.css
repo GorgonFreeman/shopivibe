@@ -58,7 +58,7 @@ cart-item._animate_out {
 }
 
 cart-item._shift_up_pretend {
-  animation: shift_up_pretend 200ms ease-out both;
+  animation: shift_up_pretend 400ms ease-out both;
 }
 
 cart-item._animate_in {
