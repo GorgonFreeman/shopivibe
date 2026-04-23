@@ -12,13 +12,22 @@
 }
 
 @keyframes dunk_in {
-  0% {
-    opacity: 0; /* Use with animation-fill-mode: backwards for the element to be hidden before animating - jumps to 0% state */
-    transform: translateY(-100%);
+  0% { /* Use with animation-fill-mode: backwards for the element to be hidden before animating - jumps to 0% state */
+    opacity: 0;
+    transform: translateY(-120%);
   }
-  100% {
+
+  60% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(10%); /* overshoot past final */
+  }
+
+  80% {
+    transform: translateY(-5%); /* bounce back up */
+  }
+
+  100% {
+    transform: translateY(0); /* settle */
   }
 }
 
