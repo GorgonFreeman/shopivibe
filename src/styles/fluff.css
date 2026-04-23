@@ -38,8 +38,10 @@ buy-button {
   margin: 0 auto;
 }
 
+/* 
 collection-products product-tile {
   --animation_delay_increment: 20ms;
   animation: dunk_in 500ms ease-out both;
   animation-delay: calc(var(--index) * var(--animation_delay_increment));
-}
+} 
+*/
