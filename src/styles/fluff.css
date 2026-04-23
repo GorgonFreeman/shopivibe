@@ -33,3 +33,7 @@ product-modal-content {
   display: block;
   max-width: 300px;
 }
+
+buy-button {
+  margin: 0 auto;
+}

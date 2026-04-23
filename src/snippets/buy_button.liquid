@@ -2,5 +2,11 @@
   {% if product %}data-rendered{% endif %} 
   data-id="{{ product.selected_or_first_available_variant.id }}"
 >
-  <a data-ref="anchor" href="/cart/add?id={{ product.selected_or_first_available_variant.id }}">{{ 'products.add_to_cart' | t }}</a>
+  <a 
+    data-ref="anchor" 
+    href="/cart/add?id={{ product.selected_or_first_available_variant.id }}" 
+    class="button"
+  >
+    {{ 'products.add_to_cart' | t }}
+  </a>
 </buy-button> 
