@@ -2,3 +2,10 @@
   position: sticky;
   top: 0;
 }
+
+header {
+  background: black;
+  color: white;
+  padding: 1em;
+  text-align: center;
+}
