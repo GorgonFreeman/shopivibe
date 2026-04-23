@@ -52,8 +52,8 @@ cart-item._animate_in {
   background-color: var(--bg);
   color: var(--color);
   font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
+  padding: 0.5em 1em;
+  border-radius: 0.25em;
   border: none;
   cursor: pointer;
   text-decoration: none;
