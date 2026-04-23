@@ -1,0 +1,49 @@
+{% if section.settings.source == 'collection' and section.settings.collection != blank %}
+  {% assign products = section.settings.collection.products %}
+{% elsif section.settings.source == 'products' %}
+  {% assign products = section.settings.products %}
+{% endif %}
+
+{% for product in products %}
+  {% render 'product_tile', product: product %}
+{% endfor %}
+
+{% schema %}
+  {
+    "name": "Product tiles",
+    "settings": [
+      {
+        "type": "select",
+        "id": "source",
+        "label": "Source",
+        "options": [
+          {
+            "value": "collection",
+            "label": "Collection"
+          },
+          {
+            "value": "products",
+            "label": "Products"
+          }
+        ],
+        "default": "collection"
+      },
+      {
+        "type": "collection",
+        "id": "collection",
+        "label": "Collection"
+      },
+      {
+        "type": "product_list",
+        "id": "products",
+        "label": "Products",
+        "limit": 50
+      }
+    ],
+    "presets": [
+      {
+        "name": "Product tiles"
+      }
+    ]
+  }
+{% endschema %}
