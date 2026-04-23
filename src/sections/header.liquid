@@ -2,6 +2,7 @@
   <a 
     href="{{ routes.root_url }}"
   >{{ shop.name }}</a>
+  {% render 'cart_icon', count: cart.item_count %}
 </header>
 
 {% schema %}
