@@ -4,7 +4,11 @@
   {% assign products = section.settings.products %}
 {% endif %}
 
-{% for product in products %}
+{% if section.settings.source == 'collection' and section.settings.limit > 0 %}
+  {% assign limit = section.settings.limit %}
+{% endif %}
+
+{% for product in products limit: limit %}
   {% render 'product_tile', product: product %}
 {% endfor %}
 
@@ -29,15 +33,21 @@
         "default": "collection"
       },
       {
+        "type": "product_list",
+        "id": "products",
+        "label": "Products"
+      },
+      {
         "type": "collection",
         "id": "collection",
         "label": "Collection"
       },
       {
-        "type": "product_list",
-        "id": "products",
-        "label": "Products",
-        "limit": 50
+        "type": "number",
+        "id": "limit",
+        "label": "Limit",
+        "default": 12,
+        "visible_if": "{{ section.settings.source == 'collection' }}"
       }
     ],
     "presets": [
