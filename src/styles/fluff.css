@@ -37,3 +37,8 @@ product-modal-content {
 buy-button {
   margin: 0 auto;
 }
+
+collection-products product-tile {
+  animation: dunk_in 500ms ease-out forwards;
+  animation-delay: calc(var(--index) * 100ms);
+}

@@ -1,6 +1,6 @@
 {%- layout none -%}
 {%- paginate collection.products by settings.collection_products_per_page -%}
   {% for product in collection.products %}
-    {% render 'product_tile', product: product %}
+    {% render 'product_tile', product: product, index: forloop.index0 %}
   {% endfor %}
 {%- endpaginate -%}

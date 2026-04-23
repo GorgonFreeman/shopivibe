@@ -2,7 +2,7 @@
   <collection-display>
     <collection-products class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
       {% for product in collection.products %}
-        {% render 'product_tile', product: product %}
+        {% render 'product_tile', product: product, index: forloop.index0 %}
       {% endfor %}
     </collection-products>
     <button data-ref="loadMoreButton">load more</button>

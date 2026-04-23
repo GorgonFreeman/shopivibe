@@ -9,7 +9,7 @@
 {% endif %}
 
 {% for product in products limit: limit %}
-  {% render 'product_tile', product: product %}
+  {% render 'product_tile', product: product, index: forloop.index0 %}
 {% endfor %}
 
 {% schema %}
