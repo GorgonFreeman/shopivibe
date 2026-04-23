@@ -12,10 +12,12 @@
 }
 
 @keyframes dunk_in {
-  from {
+  0% {
+    opacity: 0; /* Use with animation-fill-mode: backwards for the element to be hidden before animating - jumps to 0% state */
     transform: translateY(-100%);
   }
-  to {
+  100% {
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -43,7 +45,7 @@ cart-item._animate_out {
 }
 
 cart-item._animate_in {
-  animation: dunk_in 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: dunk_in 200ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .button {

@@ -39,6 +39,6 @@ buy-button {
 }
 
 collection-products product-tile {
-  animation: dunk_in 500ms ease-out forwards;
+  animation: dunk_in 500ms ease-out both;
   animation-delay: calc(var(--index) * 100ms);
 }
