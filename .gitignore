@@ -4,3 +4,4 @@ staging/
 **/snippets/js_translations.liquid
 .creds.yml
 .vite/
+.DS_Store
