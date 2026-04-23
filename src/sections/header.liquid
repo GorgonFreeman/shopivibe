@@ -1,16 +1,15 @@
-<header>
-  <a 
-    href="{{ routes.root_url }}"
-    class="mx-auto"
-  >{{ shop.name }}</a>
-  <a href="/cart">
-    {% render 'cart_icon', count: cart.item_count %}
-  </a>
-</header>
+<a
+  href="{{ routes.root_url }}"
+  class="mx-auto"
+>{{ shop.name }}</a>
+<a href="/cart">
+  {% render 'cart_icon', count: cart.item_count %}
+</a>
 
 {% schema %}
   {
     "name": "Header",
+    "tag": "header",
     "settings": []
   }
 {% endschema %}
