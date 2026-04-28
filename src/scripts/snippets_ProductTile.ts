@@ -15,34 +15,35 @@ class ProductTile extends LitElement {
   handle?: string;
 
   shouldUpdate() {
-    console.log('rendered', this.rendered);
     return !this.rendered;
   }
 
-  async render() {
-
-    console.log('render');
-
-    if (!this.product) {
-      if (!this.handle) {
-        console.error('No product or handle provided');
-        return;
-      }
-
-      // Fetch using handle
-      const productResponse = await customFetch(`/products/${ this.handle }.json`, {
-        method: 'get',
-      });
-
-      this.product = productResponse?.result?.product;
+  connectedCallback() {
+    super.connectedCallback();
+    if (!this.rendered && !this.product && this.handle) {
+      void this.loadProduct();
     }
+  }
 
+  private async loadProduct() {
+    const productResponse = await customFetch(`/products/${ this.handle }.json`, {
+      method: 'get',
+    });
+    this.product = productResponse?.result?.product;
     if (!this.product) {
       console.error('Unable to fetch product');
       return;
     }
+    this.requestUpdate();
+  }
 
-    // console.log({ product: this.product });
+  render() {
+    if (!this.product) {
+      if (!this.rendered && !this.handle) {
+        console.error('No product or handle provided');
+      }
+      return html``;
+    }
 
     const {
       title,
@@ -51,13 +52,12 @@ class ProductTile extends LitElement {
       variants,
     } = this.product;
 
-    const {
-      src: featuredImageSrc,
-      alt: featuredImageAlt,
-    } = featuredImage || {};
-    
-    console.log({ variants });
-    const selectedOrFirstAvailableVariant = variants.find((v) => v.available) || variants[0];
+    const fi = featuredImage as { src?: string; alt?: string } | undefined;
+    const featuredImageSrc = fi?.src;
+    const featuredImageAlt = fi?.alt;
+
+    const variantList = variants as { available?: boolean; id?: unknown }[] | undefined;
+    const selectedOrFirstAvailableVariant = variantList?.find((v) => v.available) || variantList?.[0];
 
     return html`
       <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }" class="_product_image_skelly" onload="(el => { el.classList.add('_loaded'); })(this)">
