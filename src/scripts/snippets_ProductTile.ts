@@ -1,4 +1,4 @@
-import { LitElement } from 'lit';
+import { html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { customFetch } from './utils';
 
@@ -14,15 +14,14 @@ class ProductTile extends LitElement {
   @property({ type: String, attribute: 'data-handle' })
   handle?: string;
 
-  firstUpdated() {
-    if (this.rendered) {
-      return;
-    }
-
-    this.hydrate();
+  shouldUpdate() {
+    console.log('rendered', this.rendered);
+    return !this.rendered;
   }
 
-  async hydrate() {
+  async render() {
+
+    console.log('render');
 
     if (!this.product) {
       if (!this.handle) {
@@ -60,7 +59,7 @@ class ProductTile extends LitElement {
     console.log({ variants });
     const selectedOrFirstAvailableVariant = variants.find((v) => v.available) || variants[0];
 
-    this.renderRoot.innerHTML = `
+    return html`
       <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }" class="_product_image_skelly" onload="(el => { el.classList.add('_loaded'); })(this)">
       <a href="${ url }">${ title }</a>
       <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
