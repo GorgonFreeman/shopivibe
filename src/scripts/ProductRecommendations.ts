@@ -25,12 +25,18 @@ function parseRecommendationsFromResponse(text: string): Element | null {
 }
 
 function bindRecommendationsCarousel(container: Element) {
+  if (container.hasAttribute('data-carousel-nav-bound')) {
+    return;
+  }
+
   const track = container.querySelector<HTMLElement>('[data-carousel-track]');
   const prevBtn = container.querySelector<HTMLButtonElement>('[data-carousel-prev]');
   const nextBtn = container.querySelector<HTMLButtonElement>('[data-carousel-next]');
   if (!track || !prevBtn || !nextBtn) {
     return;
   }
+
+  container.setAttribute('data-carousel-nav-bound', '');
 
   const step = () => Math.max(200, Math.floor(track.clientWidth * 0.85));
 
@@ -149,7 +155,7 @@ class ProductRecommendations extends LitElement {
           <button
             type="button"
             class="recommendations-carousel__btn"
-            aria-label="{{ 'sections.recommendations.previous' | t }}"
+            aria-label="${ t('sections.recommendations.previous') }"
             data-carousel-prev
           >
             ‹
@@ -157,7 +163,7 @@ class ProductRecommendations extends LitElement {
           <button
             type="button"
             class="recommendations-carousel__btn"
-            aria-label="{{ 'sections.recommendations.next' | t }}"
+            aria-label="${ t('sections.recommendations.next') }"
             data-carousel-next
           >
             ›

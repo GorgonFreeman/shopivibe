@@ -99,6 +99,104 @@ cart-item._animate_in {
   font-size: 0.875rem;
 }
 
+/* Carousel layout: must live in global CSS so it applies inside product modal (not only recommendations section). */
+product-recommendations {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .recommendations-carousel {
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.recommendations-carousel__track {
+  display: flex;
+  gap: 1rem;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline-start: 2.75rem;
+  scroll-padding-inline-end: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 0.25rem;
+  overscroll-behavior-x: contain;
+}
+
+.recommendations-carousel__slide {
+  flex: 0 0 min(85%, 18rem);
+  scroll-snap-align: start;
+  scroll-margin-inline-start: 0;
+  scroll-margin-inline-end: 0;
+}
+
+.recommendations-carousel__slide:first-child {
+  scroll-margin-inline-start: 2.75rem;
+}
+
+.recommendations-carousel__slide:last-child {
+  scroll-margin-inline-end: 0;
+}
+
+.recommendations-carousel__slide product-tile {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.recommendations-carousel__nav {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.recommendations-carousel__btn[data-carousel-prev] {
+  position: absolute;
+  left: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.recommendations-carousel__btn[data-carousel-next] {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.recommendations-carousel__btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  border-radius: 9999px;
+  border: 1px solid rgb(0 0 0 / 12%);
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #222;
+}
+
+.recommendations-carousel__btn:hover {
+  border-color: rgb(0 0 0 / 22%);
+  background: #fff;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 14%);
+}
+
+.recommendations-carousel__btn:focus-visible {
+  outline: 2px solid #222;
+  outline-offset: 2px;
 }
