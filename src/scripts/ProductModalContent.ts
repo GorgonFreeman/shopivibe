@@ -2,6 +2,7 @@ import { LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { customFetch } from './utils';
 import './snippets_BuyButton';
+import './ProductRecommendations';
 
 class ProductModalContent extends LitElement {
   createRenderRoot() { return this; }
@@ -44,6 +45,7 @@ class ProductModalContent extends LitElement {
     }
 
     const {
+      id: productId,
       title,
       url,
       featured_image: featuredImageSrc,
@@ -66,6 +68,7 @@ class ProductModalContent extends LitElement {
       ">
       <a href="${ url }">${ title }</a>
       <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
+      <product-recommendations product-id=${ productId } intent="related" limit="10"></product-recommendations>
     `;
   }
 }

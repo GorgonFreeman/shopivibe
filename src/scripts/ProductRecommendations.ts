@@ -1,4 +1,12 @@
-import { LitElement } from 'lit';
+import { t } from './utils';
+import { LitElement, html, nothing, PropertyValues } from 'lit';
+import { map } from 'lit/directives/map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { property, state } from 'lit/decorators.js';
+import type { ProductJSON } from './types/types';
+import './snippets_ProductTile';
+import './snippets_BuyButton';
+type RecommendationsIntent = 'related' | 'complementary';
 
 function parseRecommendationsFromResponse(text: string): Element | null {
   const doc = new DOMParser().parseFromString(text, 'text/html');
@@ -36,56 +44,127 @@ function bindRecommendationsCarousel(container: Element) {
 }
 
 class ProductRecommendations extends LitElement {
+
+  @property({ type: String, attribute: 'product-id' })
+  productId?: string;
+
+  @state()
+  url?: string;
+
+  @property({ type: Boolean, attribute: 'recommendations-init' })
+  recommendationsInit = false;
+
+  @property({ type: Number, attribute: 'limit' })
+  limit = 10;
+
+  @property({ type: String, attribute: 'intent' })
+  intent: RecommendationsIntent = 'related';
+
+  @state()
+  recommendations?: ProductJSON[];
+
   createRenderRoot() {
     return this;
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
 
-    if (this.dataset.recommendationsInit === 'true') {
+    if (!this.productId) {
       return;
     }
-
-    const url = this.getAttribute('data-url');
-    if (!url) {
-      return;
-    }
-
-    this.dataset.recommendationsInit = 'true';
+    this.url = `${ window?.Shopify?.routes?.root }recommendations/products.json?product_id=${ this.productId }&limit=${ this.limit }&intent=${ this.intent }`;
 
     if (this.querySelector('[data-carousel-track]')) {
       bindRecommendationsCarousel(this);
     }
 
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        if (!entries[0]?.isIntersecting) {
-          return;
-        }
-        obs.disconnect();
+    try {
+      const response = await fetch(this.url);
+      const data = await response.json();
+      console.log(data);
+      this.recommendations = data.products as ProductJSON[];
+    } catch (error) {
+      console.error('productRecommendations', error);
+    }
 
-        fetch(url)
-          .then((response) => response.text())
-          .then((text) => {
-            const fragment = parseRecommendationsFromResponse(text);
-            if (fragment?.innerHTML.trim()) {
-              this.innerHTML = fragment.innerHTML;
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => bindRecommendationsCarousel(this));
-              });
-            } else {
-              this.innerHTML = '';
-            }
-          })
-          .catch((error) => {
-            console.error('productRecommendations', error);
-          });
-      },
-      { rootMargin: '0px 0px 200px 0px' },
-    );
+  }
 
-    observer.observe(this);
+  updated(changedProperties: PropertyValues) {
+    super.updated(changedProperties);
+    if (changedProperties.has('recommendations') && this.recommendations) {
+      bindRecommendationsCarousel(this);
+    }
+  }
+
+  render() {
+    if (!this.recommendations || this.recommendations.length === 0) {
+      return nothing;
+    }
+    return html`
+      ${ this.intent == 'complementary' ? html`
+        <h2 class="recommendations-section__heading" id="recommendations-heading-${ this.id }">
+          ${ t('sections.recommendations.heading_complementary') }
+        </h2>
+      ` : html`
+        <h2 class="recommendations-section__heading" id="recommendations-heading-${ this.id }">
+          ${ t('sections.recommendations.heading_related') }
+        </h2>
+      ` }
+      <div
+        class="recommendations-carousel"
+        data-carousel
+      >
+        <div
+          class="recommendations-carousel__track"
+          data-carousel-track
+          role="list"
+        >
+          ${ map(this.recommendations, (product: ProductJSON) => product ? html`
+            <div class="recommendations-carousel__slide" role="listitem">
+              <product-tile
+                data-rendered
+                .data-product=${ product }
+                data-handle=${ product.handle }
+              >
+                ${ product.featured_image ? html`
+                  <img
+                    src="${ product.featured_image }"
+                    width="300"
+                    alt="${ product.media[0].alt ?? '' }"
+                    class="_product_image_skelly"
+                    onload="(el => { el.classList.add('_loaded'); })(this)"
+                  >
+                ` : nothing }
+                <a href="${ product.url }">
+                  ${ product.title }
+                </a>
+                <buy-button data-id="${ product.variants[0].id ?? '' }"></buy-button>
+              </product-tile>
+            </div>
+          ` : nothing) }
+        </div>
+
+        <div class="recommendations-carousel__nav">
+          <button
+            type="button"
+            class="recommendations-carousel__btn"
+            aria-label="{{ 'sections.recommendations.previous' | t }}"
+            data-carousel-prev
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            class="recommendations-carousel__btn"
+            aria-label="{{ 'sections.recommendations.next' | t }}"
+            data-carousel-next
+          >
+            ›
+          </button>
+        </div>
+      </div>
+    `;
   }
 }
 
