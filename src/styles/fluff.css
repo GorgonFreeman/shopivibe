@@ -31,18 +31,7 @@ img._product_image_skelly._loaded {
   animation: none;
 }
 
-/* Product quick-view: full-viewport dialog; hero image capped at 300px below */
-custom-modal:has(product-modal-content) dialog {
-  width: 100vw;
-  max-width: 100vw;
-  min-height: 100dvh;
-  max-height: 100dvh;
-  margin: 0;
-  box-sizing: border-box;
-  border: none;
-  padding: 1rem;
-  overflow-y: auto;
-}
+/* Product quick-view sheet: dialog width/close in snippets_CustomModal.ts (shadow DOM) */
 
 product-modal-content {
   display: block;
