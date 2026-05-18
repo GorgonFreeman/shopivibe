@@ -44,12 +44,18 @@ class CustomModal extends LitElement {
     }
 
     dialog.dialog--product-sheet {
-      width: 100vw;
-      max-width: 100vw;
-      min-height: 100dvh;
-      max-height: 100dvh;
+      width: min(98vw, 48rem);
+      max-width: 98vw;
+      max-height: min(92dvh, 52rem);
+      margin: auto;
       overflow-y: auto;
       overscroll-behavior: contain;
+      border-radius: 0.5rem;
+      box-shadow: 0 12px 40px rgb(0 0 0 / 18%);
+    }
+
+    dialog.dialog--product-sheet::backdrop {
+      background: rgb(0 0 0 / 35%);
     }
 
     .dialog__close {
@@ -91,6 +97,8 @@ class CustomModal extends LitElement {
   @state()
   private productSheet = false;
 
+  private scrollLocked = false;
+
   connectedCallback() {
     super.connectedCallback();
     this.syncProductSheetFlag();
@@ -110,7 +118,10 @@ class CustomModal extends LitElement {
 
     this.dialogEl?.addEventListener('close', () => {
       this.open = false;
-      unlockBodyScroll();
+      if (this.scrollLocked) {
+        unlockBodyScroll();
+        this.scrollLocked = false;
+      }
 
       if (this.hasAttribute('data-self-destruct')) {
         this.remove();
@@ -130,8 +141,9 @@ class CustomModal extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (this.dialogEl?.open) {
+    if (this.scrollLocked) {
       unlockBodyScroll();
+      this.scrollLocked = false;
     }
   }
 
@@ -149,7 +161,10 @@ class CustomModal extends LitElement {
 
   showModal() {
     if (!this.dialogEl?.open) {
-      lockBodyScroll();
+      if (!this.productSheet) {
+        lockBodyScroll();
+        this.scrollLocked = true;
+      }
       this.dialogEl?.showModal();
     }
     this.open = true;
