@@ -34,59 +34,6 @@ function unlockBodyScroll() {
 }
 
 class CustomModal extends LitElement {
-  static styles = css`
-    dialog {
-      margin: 0;
-      border: none;
-      padding: 1rem;
-      box-sizing: border-box;
-    }
-
-    dialog.dialog--product-sheet {
-      width: min(98vw, 48rem);
-      max-width: 98vw;
-      max-height: min(92dvh, 52rem);
-      margin: auto;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      border-radius: 0.5rem;
-      box-shadow: 0 12px 40px rgb(0 0 0 / 18%);
-    }
-
-    dialog.dialog--product-sheet::backdrop {
-      background: rgb(0 0 0 / 35%);
-    }
-
-    .dialog__close {
-      position: absolute;
-      top: 0.75rem;
-      right: 0.75rem;
-      z-index: 1;
-      margin: 0;
-    }
-
-    .dialog__close button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 2.5rem;
-      min-height: 2.5rem;
-      padding: 0.25rem 0.5rem;
-      border: none;
-      border-radius: 0.375rem;
-      background: none;
-      font-size: 1.5rem;
-      line-height: 1;
-      cursor: pointer;
-      color: #222;
-    }
-
-    .dialog__close button:focus-visible {
-      outline: 2px solid #222;
-      outline-offset: 2px;
-    }
-  `;
-
   @query('dialog', true)
   dialogEl!: HTMLDialogElement;
 
