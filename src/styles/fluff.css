@@ -46,6 +46,15 @@ product-modal-content > img._product_image_skelly {
   height: auto;
 }
 
+product-modal-content > a {
+  display: block;
+}
+
+product-modal-content > buy-button {
+  display: block;
+  margin: 0.75rem 0 0;
+}
+
 buy-button {
   margin: 0 auto;
 }
