@@ -36,7 +36,6 @@ function unlockBodyScroll() {
 class CustomModal extends LitElement {
   static styles = css`
     dialog {
-      position: relative;
       margin: 0;
       border: none;
       padding: 1rem;
@@ -161,10 +160,8 @@ class CustomModal extends LitElement {
 
   showModal() {
     if (!this.dialogEl?.open) {
-      if (!this.productSheet) {
-        lockBodyScroll();
-        this.scrollLocked = true;
-      }
+      lockBodyScroll();
+      this.scrollLocked = true;
       this.dialogEl?.showModal();
     }
     this.open = true;
