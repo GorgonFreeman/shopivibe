@@ -1,6 +1,7 @@
 import { LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { customFetch } from './utils';
+import { renderBuyButtonHTML } from './snippets_BuyButton';
 import './snippets_BuyButton';
 import './ProductRecommendations';
 
@@ -67,7 +68,7 @@ class ProductModalContent extends LitElement {
         onload="(el => { el.classList.add('_loaded'); })(this)"
       ">
       <a href="${ url }">${ title }</a>
-      <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
+      ${ renderBuyButtonHTML(selectedOrFirstAvailableVariant.id) }
       <product-recommendations product-id=${ productId } intent="related" limit="10"></product-recommendations>
     `;
   }
