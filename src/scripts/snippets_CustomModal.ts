@@ -1,4 +1,4 @@
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
@@ -123,14 +123,13 @@ class CustomModal extends LitElement {
 
   render() {
     return html`
-      <dialog class=${classMap({ 'dialog--product-sheet': this.productSheet })}>
-        ${this.productSheet
-          ? html`
-              <form method="dialog" class="dialog__close">
-                <button type="submit" aria-label="Close">×</button>
-              </form>
-            `
-          : nothing}
+      <dialog
+        class=${classMap({
+          'm-0 box-border border-0 p-4': true,
+          'm-auto max-h-[min(92dvh,52rem)] w-[min(98vw,48rem)] max-w-[98vw] overflow-y-auto overscroll-contain rounded-lg shadow-[0_12px_40px_rgb(0_0_0/0.18)] backdrop:bg-black/35':
+            this.productSheet,
+        })}
+      >
         <slot></slot>
       </dialog>
     `;
