@@ -75,6 +75,29 @@ const customFetch = async (url, {
 const t = (path: string) =>
   path.split('.').reduce((obj, key) => obj?.[key], window.shopivibe?.translations) ?? path;
 
+/** Format an integer-cents amount (as returned by Shopify's JSON endpoints)
+ *  using the shop's currency and active locale exposed via js_settings.liquid. */
+const formatMoney = (cents: number | string | null | undefined): string => {
+  if (cents == null || cents === '') {
+    return '';
+  }
+  const numeric = typeof cents === 'string' ? parseFloat(cents) : Number(cents);
+  if (Number.isNaN(numeric)) {
+    return '';
+  }
+  const shop = window.shopivibe?.settings?.shop || {};
+  const currency = shop.currency || 'USD';
+  const locale = shop.locale || 'en';
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+    }).format(numeric / 100);
+  } catch {
+    return `${ (numeric / 100).toFixed(2) } ${ currency }`;
+  }
+};
+
 /** Same as Liquid `| escape` (HTML-safe for attributes and text). */
 const liquidEscape = (value: unknown) =>
   String(value)
@@ -87,5 +110,6 @@ export {
   wait,
   customFetch,
   t,
+  formatMoney,
   liquidEscape,
 };
