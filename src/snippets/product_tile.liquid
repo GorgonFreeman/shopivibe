@@ -10,13 +10,30 @@
   {% endif %}
 >
   {% if product %}
+    {%- assign image_media = product.media | where: 'media_type', 'image' -%}
+    {%- assign hover_image = image_media[1] -%}
     {% if product.featured_image != blank %}
-      <img
-        src="{{ product.featured_image | image_url: width: 300 }}"
-        alt="{{ product.featured_image.alt | escape }}"
-        class="_product_image_skelly"
-        onload="(el => { el.classList.add('_loaded'); })(this)"
-      >
+      <div class="_product_tile_media">
+        <img
+          src="{{ product.featured_image | image_url: width: 300 }}"
+          alt="{{ product.featured_image.alt | escape }}"
+          width="300"
+          height="460"
+          class="_product_image_skelly"
+          onload="(el => { el.classList.add('_loaded'); })(this)"
+        >
+        {% if hover_image %}
+          <img
+            src="{{ hover_image | image_url: width: 300 }}"
+            alt="{{ hover_image.alt | escape }}"
+            width="300"
+            height="460"
+            class="_product_image_hover"
+            loading="lazy"
+            aria-hidden="true"
+          >
+        {% endif %}
+      </div>
     {% endif %}
     <a href="{{ product.url }}">
       {{ product.title }}
