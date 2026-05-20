@@ -126,29 +126,54 @@ class ProductRecommendations extends LitElement {
           data-carousel-track
           role="list"
         >
-          ${ map(this.recommendations, (product: ProductJSON) => product ? html`
-            <div class="recommendations-carousel__slide" role="listitem">
-              <product-tile
-                data-rendered
-                .data-product=${ product }
-                data-handle=${ product.handle }
-              >
-                ${ product.featured_image ? html`
-                  <img
-                    src="${ product.featured_image }"
-                    width="300"
-                    alt="${ product.media[0].alt ?? '' }"
-                    class="_product_image_skelly"
-                    onload="(el => { el.classList.add('_loaded'); })(this)"
-                  >
-                ` : nothing }
-                <a href="${ product.url }">
-                  ${ product.title }
-                </a>
-                <buy-button data-id="${ product.variants[0].id ?? '' }"></buy-button>
-              </product-tile>
-            </div>
-          ` : nothing) }
+          ${ map(this.recommendations, (product: ProductJSON) => {
+            if (!product) {
+              return nothing;
+            }
+            const mediaList = Array.isArray(product.media) ? product.media : [];
+            const imageMedia = mediaList.filter(
+              (m: { media_type?: string }) => !m?.media_type || m.media_type === 'image',
+            );
+            const hoverMedia = imageMedia[1] as
+              | { src?: string; alt?: string; preview_image?: { src?: string; alt?: string } }
+              | undefined;
+            const hoverSrc = hoverMedia?.src ?? hoverMedia?.preview_image?.src;
+            const hoverAlt = hoverMedia?.alt ?? hoverMedia?.preview_image?.alt ?? '';
+            return html`
+              <div class="recommendations-carousel__slide" role="listitem">
+                <product-tile
+                  data-rendered
+                  .data-product=${ product }
+                  data-handle=${ product.handle }
+                >
+                  ${ product.featured_image ? html`
+                    <div class="_product_tile_media">
+                      <img
+                        src="${ product.featured_image }"
+                        width="300"
+                        alt="${ product.media[0].alt ?? '' }"
+                        class="_product_image_skelly"
+                        onload="(el => { el.classList.add('_loaded'); })(this)"
+                      >
+                      ${ hoverSrc ? html`
+                        <img
+                          src="${ hoverSrc }"
+                          alt="${ hoverAlt }"
+                          class="_product_image_hover"
+                          loading="lazy"
+                          aria-hidden="true"
+                        >
+                      ` : nothing }
+                    </div>
+                  ` : nothing }
+                  <a href="${ product.url }">
+                    ${ product.title }
+                  </a>
+                  <buy-button data-id="${ product.variants[0].id ?? '' }"></buy-button>
+                </product-tile>
+              </div>
+            `;
+          }) }
         </div>
 
         <div class="recommendations-carousel__nav">
