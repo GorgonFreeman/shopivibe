@@ -1,6 +1,13 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import { customFetch } from './utils';
+
+type ProductMediaItem = {
+  media_type?: string;
+  src?: string;
+  alt?: string;
+  preview_image?: { src?: string; alt?: string };
+};
 
 class ProductTile extends LitElement {
   createRenderRoot() { return this; }
@@ -48,6 +55,7 @@ class ProductTile extends LitElement {
       title,
       url,
       image: featuredImage,
+      media,
       variants,
     } = this.product;
 
@@ -55,12 +63,29 @@ class ProductTile extends LitElement {
       src: featuredImageSrc,
       alt: featuredImageAlt,
     } = featuredImage || {};
-    
+
+    const mediaList = (Array.isArray(media) ? media : []) as ProductMediaItem[];
+    const imageMedia = mediaList.filter((m) => !m?.media_type || m.media_type === 'image');
+    const hoverMedia = imageMedia[1];
+    const hoverSrc = hoverMedia?.src || hoverMedia?.preview_image?.src;
+    const hoverAlt = hoverMedia?.alt || hoverMedia?.preview_image?.alt || '';
+
     console.log({ variants });
     const selectedOrFirstAvailableVariant = variants.find((v) => v.available) || variants[0];
 
     return html`
-      <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }" class="_product_image_skelly" onload="(el => { el.classList.add('_loaded'); })(this)">
+      <div class="_product_tile_media">
+        <img src="${ featuredImageSrc }" alt="${ featuredImageAlt }" class="_product_image_skelly" onload="(el => { el.classList.add('_loaded'); })(this)">
+        ${ hoverSrc ? html`
+          <img
+            src="${ hoverSrc }"
+            alt="${ hoverAlt }"
+            class="_product_image_hover"
+            loading="lazy"
+            aria-hidden="true"
+          >
+        ` : nothing }
+      </div>
       <a href="${ url }">${ title }</a>
       <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
     `;
