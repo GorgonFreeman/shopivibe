@@ -31,6 +31,32 @@ img._product_image_skelly._loaded {
   animation: none;
 }
 
+product-tile ._product_tile_media {
+  position: relative;
+  display: block;
+}
+
+product-tile ._product_tile_media > img {
+  display: block;
+}
+
+product-tile ._product_image_hover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  product-tile:hover ._product_image_hover {
+    opacity: 1;
+  }
+}
+
 /* Product quick-view sheet: dialog width/close in snippets_CustomModal.ts (shadow DOM) */
 
 product-modal-content {
