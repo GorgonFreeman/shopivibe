@@ -85,6 +85,10 @@ buy-button {
   margin: 0 auto;
 }
 
+product-price {
+  font-weight: 600;
+}
+
 /* 
 collection-products product-tile {
   --animation_delay_increment: 20ms;
