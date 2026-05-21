@@ -86,6 +86,10 @@ buy-button {
 }
 
 product-price {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  align-items: baseline;
   font-weight: 600;
 }
 
