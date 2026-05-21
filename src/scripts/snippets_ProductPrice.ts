@@ -40,8 +40,8 @@ class ProductPrice extends LitElement {
 
     this.innerHTML = `
       ${ priceVaries ? `<span class="_product_price__from">${ t('products.price_from') }</span>` : '' }
-      <span class="_product_price__current">${ formatMoney(price) }</span>
       ${ onSale ? `<s class="_product_price__compare">${ formatMoney(compareAtPrice) }</s>` : '' }
+      <span class="_product_price__current">${ formatMoney(price) }</span>
     `;
   }
 }
