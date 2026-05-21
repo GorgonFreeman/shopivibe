@@ -2,13 +2,6 @@ import { LitElement } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { customFetch, wait, t } from './utils';
 
-/** Same markup as snippets/buy_button.liquid for JS-rendered product UI. */
-export function renderBuyButtonHTML(variantId: string | number) {
-  const id = String(variantId);
-  const label = t('products.add_to_cart');
-  return `<buy-button data-rendered data-id="${ id }"><a data-ref="anchor" href="/cart/add?id=${ id }" class="button">${ label }</a></buy-button>`;
-}
-
 class BuyButton extends LitElement {
   createRenderRoot() { return this; }
 
