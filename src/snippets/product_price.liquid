@@ -6,6 +6,6 @@
     {%- if product.compare_at_price > product.price -%}
       <s class="product-price__compare">{{ product.compare_at_price | money }}</s>
     {%- endif -%}
-    <span class="product-price__current{% if product.compare_at_price > product.price %} sale{% endif %}">{{ product.price | money }}{%- if product.compare_at_price > product.price %} ({{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price | round }}% off){%- endif -%}</span>
+    <span class="product-price__current{% if product.compare_at_price > product.price %} sale{% endif %}">{{ product.price | money }}{%- if product.compare_at_price > product.price %} ({{ product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round: 0 }}% off){%- endif -%}</span>
   </product-price>
 {%- endif -%}
