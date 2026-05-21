@@ -1,5 +1,5 @@
 {%- if product -%}
-  <div class="product-price">
+  <product-price>
     {%- if product.price_varies -%}
       <span class="product-price__from">{{ 'products.price_from' | t }}</span>
     {%- endif -%}
@@ -7,5 +7,5 @@
     {%- if product.compare_at_price > product.price -%}
       <s class="product-price__compare">{{ product.compare_at_price | money }}</s>
     {%- endif -%}
-  </div>
+  </product-price>
 {%- endif -%}
