@@ -8,7 +8,8 @@
     "add_to_cart": "Add to cart",
     "adding": "Adding",
     "added": "Added!",
-    "add_to_cart_error": "Error"
+    "add_to_cart_error": "Error",
+    "price_from": "From",
   },
   "sections": {
     "recommendations": {
