@@ -1,6 +1,7 @@
 :root {
   --wfpink: #f8baca;
   --skelly_colour: silver;
+  --sale_price_colour: #c00000;
 }
 
 cart-item {
@@ -91,6 +92,10 @@ product-price {
   gap: 0.4em;
   align-items: baseline;
   font-weight: 600;
+}
+
+product-price > .product-price__current.sale {
+  color: var(--sale_price_colour);
 }
 
 /* 
