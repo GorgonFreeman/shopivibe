@@ -3,6 +3,10 @@ export interface Shopify {
   routes: {
     root: string;
   };
+  currency: {
+    active: string;
+    rate: string;
+  }
 }
 
 export type ProductJSON = {
