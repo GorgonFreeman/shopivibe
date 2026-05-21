@@ -6,6 +6,7 @@ import { property, state } from 'lit/decorators.js';
 import type { ProductJSON } from './types/types';
 import './snippets_ProductTile';
 import './snippets_BuyButton';
+import './snippets_ProductPrice';
 type RecommendationsIntent = 'related' | 'complementary';
 
 function parseRecommendationsFromResponse(text: string): Element | null {
@@ -169,6 +170,7 @@ class ProductRecommendations extends LitElement {
                   <a href="${ product.url }">
                     ${ product.title }
                   </a>
+                  <product-price .product=${ product }></product-price>
                   <buy-button data-id="${ product.variants[0].id ?? '' }"></buy-button>
                 </product-tile>
               </div>
