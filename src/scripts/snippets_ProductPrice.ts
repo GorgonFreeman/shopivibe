@@ -31,6 +31,9 @@ class ProductPrice extends LitElement {
       variants?: Array<{ price?: number | string }>;
     };
 
+    // TODO: Fix the source of currency, the currency here is not same as shop.currency
+    const siteCurrency = window.Shopify?.currency?.active ?? '';
+
     const variantPrices = (variants ?? [])
       .map(v => Number(v?.price))
       .filter(n => !Number.isNaN(n));
@@ -41,7 +44,7 @@ class ProductPrice extends LitElement {
     this.innerHTML = `
       ${ priceVaries ? `<span class="product-price__from">${ t('products.price_from') }</span>` : '' }
       ${ onSale ? `<s class="product-price__compare">${ formatMoney(compareAtPrice) }</s>` : '' }
-      <span class="product-price__current ${ onSale ? 'sale' : '' }">${ formatMoney(price) } ${ onSale ? `(${ ((1 - Number(price) / Number(compareAtPrice)) * 100).toFixed(0) }% off)` : '' }</span>
+      <span class="product-price__current ${ onSale ? 'sale' : '' }">${ formatMoney(price) } ${ siteCurrency } ${ onSale ? `(${ ((1 - Number(price) / Number(compareAtPrice)) * 100).toFixed(0) }% off)` : '' }</span>
     `;
   }
 }
