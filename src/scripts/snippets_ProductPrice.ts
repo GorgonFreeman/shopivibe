@@ -39,9 +39,9 @@ class ProductPrice extends LitElement {
     const onSale = compareAtPrice != null && Number(compareAtPrice) > Number(price);
 
     this.innerHTML = `
-      ${ priceVaries ? `<span class="_product_price__from">${ t('products.price_from') }</span>` : '' }
-      ${ onSale ? `<s class="_product_price__compare">${ formatMoney(compareAtPrice) }</s>` : '' }
-      <span class="_product_price__current">${ formatMoney(price) }</span>
+      ${ priceVaries ? `<span class="product-price__from">${ t('products.price_from') }</span>` : '' }
+      ${ onSale ? `<s class="product-price__compare">${ formatMoney(compareAtPrice) }</s>` : '' }
+      <span class="product-price__current ${ onSale ? 'sale' : '' }">${ formatMoney(price) } ${ onSale ? `(${ ((1 - Number(price) / Number(compareAtPrice)) * 100).toFixed(0) }% off)` : '' }</span>
     `;
   }
 }
