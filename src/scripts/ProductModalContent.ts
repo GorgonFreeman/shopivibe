@@ -2,6 +2,7 @@ import { LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { customFetch } from './utils';
 import './snippets_BuyButton';
+import './snippets_ProductPrice';
 import './ProductRecommendations';
 
 class ProductModalContent extends LitElement {
@@ -67,9 +68,13 @@ class ProductModalContent extends LitElement {
         onload="(el => { el.classList.add('_loaded'); })(this)"
       ">
       <a href="${ url }">${ title }</a>
+      <product-price></product-price>
       <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
       <product-recommendations product-id=${ productId } intent="related" limit="10"></product-recommendations>
     `;
+
+    const priceEl = this.querySelector('product-price') as (HTMLElement & { product?: Record<string, unknown> }) | null;
+    if (priceEl) priceEl.product = this.product;
   }
 }
 
