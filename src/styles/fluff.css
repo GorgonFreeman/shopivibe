@@ -98,6 +98,46 @@ product-price > .product-price__current.sale {
   color: var(--sale_price_colour);
 }
 
+variant-picker {
+  display: block;
+  margin: 0.75rem 0;
+}
+
+.variant-picker__option {
+  border: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+}
+
+.variant-picker__option-name {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.variant-picker__values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.variant-picker__value {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.variant-picker__value[aria-pressed="true"] {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+
 /* 
 collection-products product-tile {
   --animation_delay_increment: 20ms;
