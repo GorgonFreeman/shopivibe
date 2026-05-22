@@ -10,7 +10,9 @@ type Variant = {
 };
 
 type ProductLike = {
+  options?: Array<string | { name: string; values?: string[] }>;
   variants?: Variant[];
+  has_only_default_variant?: boolean;
 };
 
 const OPTION_KEYS = ['option1', 'option2', 'option3'] as const;
@@ -23,7 +25,6 @@ class VariantPicker extends LitElement {
 
   private product?: ProductLike;
   private selectedValues: Record<number, string> = {};
-  private initialized = false;
 
   // Server-rendered markup lives in light DOM — skip Lit re-renders that would wipe it.
   shouldUpdate() {
@@ -32,10 +33,12 @@ class VariantPicker extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    if (this.initialized) return;
-    this.initialized = true;
+    queueMicrotask(() => this.setup());
+  }
 
+  setup() {
     this.loadProductData();
+    this.buildOptions();
     this.initSelectedValues();
     this.syncPressedState();
     this.bindButtons();
@@ -53,6 +56,87 @@ class VariantPicker extends LitElement {
     } catch (error) {
       console.error('variantPicker', 'Failed to parse product JSON', error);
     }
+  }
+
+  setProduct(product: ProductLike | Record<string, unknown>) {
+    this.product = product as ProductLike;
+
+    const script = this.querySelector<HTMLScriptElement>('script[data-ref="product"]');
+    if (script) {
+      script.textContent = JSON.stringify(product);
+    } else {
+      const el = document.createElement('script');
+      el.type = 'application/json';
+      el.dataset.ref = 'product';
+      el.textContent = JSON.stringify(product);
+      this.prepend(el);
+    }
+  }
+
+  getOptionNames(): string[] {
+    const fromProduct = (this.product?.options ?? [])
+      .map(o => typeof o === 'string' ? o : o.name)
+      .filter(Boolean) as string[];
+
+    if (fromProduct.length > 0) {
+      return fromProduct;
+    }
+
+    const variants = this.product?.variants ?? [];
+    return OPTION_KEYS
+      .map((key, i) => (variants.some(v => v[key] != null) ? `Option ${ i + 1 }` : null))
+      .filter((name): name is string => name != null);
+  }
+
+  buildOptions() {
+    if (this.querySelector('.variant-picker__value')) {
+      return;
+    }
+
+    if (!this.product?.variants?.length) {
+      return;
+    }
+
+    if (this.product.has_only_default_variant) {
+      return;
+    }
+
+    const optionNames = this.getOptionNames();
+    if (!optionNames.length) {
+      return;
+    }
+
+    const variants = this.product.variants;
+    const initial = variants.find(v => v.available) ?? variants[0];
+    const html = optionNames.map((name, i) => {
+      const key = OPTION_KEYS[i];
+      const values = [...new Set(variants.map(v => v[key]).filter((v): v is string => v != null))];
+
+      return `
+        <fieldset class="variant-picker__option">
+          <legend class="variant-picker__option-name">${ name }</legend>
+          <div class="variant-picker__values">
+            ${ values.map(value => `
+              <button
+                type="button"
+                class="variant-picker__value"
+                data-option-index="${ i }"
+                data-option-value="${ value }"
+                aria-pressed="${ initial?.[key] === value ? 'true' : 'false' }"
+              >${ value }</button>
+            `).join('') }
+          </div>
+        </fieldset>
+      `;
+    }).join('');
+
+    const script = this.querySelector('script[data-ref="product"]');
+    if (script) {
+      script.insertAdjacentHTML('afterend', html);
+      return;
+    }
+
+    this.insertAdjacentHTML('beforeend', html);
   }
 
   initSelectedValues() {
@@ -94,7 +178,8 @@ class VariantPicker extends LitElement {
   }
 
   bindButtons() {
-    this.querySelectorAll<HTMLButtonElement>('.variant-picker__value').forEach((btn) => {
+    this.querySelectorAll<HTMLButtonElement>('.variant-picker__value:not([data-bound])').forEach((btn) => {
+      btn.setAttribute('data-bound', '');
       btn.addEventListener('click', () => this.handleSelect(btn));
     });
   }
@@ -127,3 +212,5 @@ class VariantPicker extends LitElement {
 }
 
 customElements.get('variant-picker') || customElements.define('variant-picker', VariantPicker);
+
+export type VariantPickerEl = VariantPicker & HTMLElement;
