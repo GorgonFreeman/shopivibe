@@ -1,4 +1,4 @@
-import { LitElement } from 'lit';
+import { LitElement, PropertyValues } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { customFetch, wait, t } from './utils';
 
@@ -19,6 +19,13 @@ class BuyButton extends LitElement {
   firstUpdated() {
     this.hydrate();
     this.anchor?.addEventListener('click', e => this.addToCartHandler(e));
+  }
+
+  updated(changedProperties: PropertyValues) {
+    super.updated(changedProperties);
+    if (changedProperties.has('variantId') && this.variantId && this.anchor) {
+      this.anchor.setAttribute('href', `/cart/add?id=${ this.variantId }`);
+    }
   }
 
   hydrate() {
