@@ -5,10 +5,8 @@
 {%- endcomment -%}
 {%- if product and product.has_only_default_variant == false -%}
   {%- assign selected_variant = product.selected_or_first_available_variant -%}
-  <variant-picker
-    data-rendered
-    data-product="{{ product | json | escape }}"
-  >
+  <variant-picker data-rendered>
+    <script type="application/json" data-ref="product">{{ product | json }}</script>
     {%- for option in product.options_with_values -%}
       <fieldset class="variant-picker__option">
         <legend class="variant-picker__option-name">{{ option.name }}</legend>
@@ -20,7 +18,7 @@
               type="button"
               class="variant-picker__value"
               data-option-index="{{ option_index }}"
-              data-option-value="{{ value | escape }}"
+              data-option-value="{{ value }}"
               aria-pressed="{% if value == selected_value %}true{% else %}false{% endif %}"
             >
               {{ value }}
