@@ -1,5 +1,6 @@
 {{ product | json }}
 
+{% render 'variant_picker', product: product %}
 {% render 'buy_button', product %}
 
 {% schema %}
