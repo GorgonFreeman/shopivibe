@@ -58,12 +58,44 @@ product-tile ._product_image_hover {
   }
 }
 
-/* Product quick-view sheet: dialog width/close in snippets_CustomModal.ts (shadow DOM) */
+custom-modal {
+  display: contents;
+}
+
+custom-modal dialog,
+custom-modal dialog:modal {
+  box-sizing: border-box;
+  margin: auto;
+  border: 0;
+  padding: 1rem;
+  inset: unset;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 90vw;
+  height: 80dvh;
+  max-height: 80dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+custom-modal dialog.product-sheet,
+custom-modal dialog.product-sheet:modal {
+  border-radius: 0.5rem;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.18);
+}
+
+custom-modal dialog::backdrop {
+  background: rgb(0 0 0 / 0.35);
+}
 
 product-modal-content {
   display: block;
   width: 100%;
-  max-width: none;
+  max-width: 100%;
 }
 
 product-modal-content > img._product_image_skelly {

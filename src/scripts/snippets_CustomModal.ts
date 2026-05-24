@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { property, query, state } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 let openModalCount = 0;
@@ -34,33 +34,40 @@ function unlockBodyScroll() {
 }
 
 class CustomModal extends LitElement {
+  createRenderRoot() {
+    return this;
+  }
+
   @query('dialog', true)
   dialogEl!: HTMLDialogElement;
 
   @property({ type: Boolean, attribute: 'data-open', reflect: true })
   open = false;
 
-  @state()
-  private productSheet = false;
+  @property({ type: Boolean, attribute: 'data-product-sheet' })
+  productSheet = false;
 
   private scrollLocked = false;
+  private childObserver?: MutationObserver;
 
   connectedCallback() {
     super.connectedCallback();
-    this.syncProductSheetFlag();
-  }
-
-  private syncProductSheetFlag() {
-    const next = Boolean(this.querySelector('product-modal-content'));
-    if (next !== this.productSheet) {
-      this.productSheet = next;
+    if (!this.productSheet && this.querySelector('product-modal-content')) {
+      this.productSheet = true;
     }
   }
 
   firstUpdated() {
-    this.shadowRoot?.querySelector('slot')?.addEventListener('slotchange', () => {
-      this.syncProductSheetFlag();
+    this.adoptChildren();
+
+    this.childObserver = new MutationObserver(() => {
+      this.adoptChildren();
+      if (!this.hasAttribute('data-product-sheet') && this.querySelector('product-modal-content')) {
+        this.productSheet = true;
+      }
     });
+
+    this.childObserver.observe(this, { childList: true });
 
     this.dialogEl?.addEventListener('close', () => {
       this.open = false;
@@ -87,6 +94,7 @@ class CustomModal extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.childObserver?.disconnect();
     if (this.scrollLocked) {
       unlockBodyScroll();
       this.scrollLocked = false;
@@ -95,6 +103,7 @@ class CustomModal extends LitElement {
 
   updated(changed: Map<string, unknown>) {
     super.updated(changed);
+    this.adoptChildren();
 
     if (!changed.has('open') || !this.dialogEl) {
       return;
@@ -105,7 +114,27 @@ class CustomModal extends LitElement {
     }
   }
 
+  adoptChildren() {
+    const dialog = this.dialogEl;
+    if (!dialog) {
+      return;
+    }
+
+    for (const child of [...this.childNodes]) {
+      if (child !== dialog) {
+        dialog.appendChild(child);
+      }
+    }
+  }
+
   showModal() {
+    if (this.productSheet || this.querySelector('product-modal-content')) {
+      this.productSheet = true;
+      this.dialogEl?.classList.add('product-sheet');
+    }
+
+    this.adoptChildren();
+
     if (!this.dialogEl?.open) {
       lockBodyScroll();
       this.scrollLocked = true;
@@ -123,15 +152,7 @@ class CustomModal extends LitElement {
 
   render() {
     return html`
-      <dialog
-        class=${classMap({
-          'm-0 box-border border-0 p-4': true,
-          'm-auto max-h-[min(92dvh,52rem)] w-[min(98vw,48rem)] max-w-[98vw] overflow-y-auto overscroll-contain rounded-lg shadow-[0_12px_40px_rgb(0_0_0/0.18)] backdrop:bg-black/35':
-            this.productSheet,
-        })}
-      >
-        <slot></slot>
-      </dialog>
+      <dialog class=${classMap({ 'product-sheet': this.productSheet })}></dialog>
     `;
   }
 }

@@ -43,6 +43,7 @@ class CollectionProducts extends LitElement {
     const modal = document.createElement('custom-modal') as CustomModalEl;
 
     modal.setAttribute('data-self-destruct', '');
+    modal.setAttribute('data-product-sheet', '');
     modal.setAttribute('data-open', '');
 
     const modalContent = document.createElement('product-modal-content');
