@@ -1,0 +1,15 @@
+{% liquid
+  if variant == blank
+    assign variant = product.selected_or_first_available_variant
+  endif
+  assign compare_at_price = variant.compare_at_price
+  assign current_price = variant.price
+%}
+<product-price
+  data-id="{{ variant.id }}"
+>
+  {% if compare_at_price %}
+    <s>{{ compare_at_price | money }} {{ shop.currency }}</s>
+  {% endif %}
+  <span>{{ current_price | money }} {{ shop.currency }}</span>
+</product-price>

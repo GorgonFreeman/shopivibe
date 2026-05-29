@@ -21,6 +21,7 @@
     <a href="{{ product.url }}">
       {{ product.title }}
     </a>
+    {% render 'product_price', variant: product.selected_or_first_available_variant %}
     {% render 'buy_button', product: product %}
   {% else %}
     Not through Liquid - hydrate with JS
