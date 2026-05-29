@@ -31,7 +31,7 @@ class BuyButton extends LitElement {
       return;
     }
 
-    this.innerHTML = `<a data-ref="anchor" href="/cart/add?id=${ this.variantId }">${ t('products.add_to_cart') }</a>`;
+    this.innerHTML = `<a class="button" data-ref="anchor" href="/cart/add?id=${ this.variantId }">${ t('products.add_to_cart') }</a>`;
   }
 
   async addToCartHandler(e) {
