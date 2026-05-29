@@ -1,7 +1,10 @@
-import { LitElement } from 'lit';
+import { html, nothing } from 'lit';
+import { LitElement, TemplateResult } from 'lit';
 import { property } from 'lit/decorators.js';
 import { customFetch } from './utils';
 import './snippets_BuyButton';
+import './snippets_ProductPrice';
+import { ProductJSON, VariantJSON } from './types/types';
 
 class ProductModalContent extends LitElement {
   createRenderRoot() { return this; }
@@ -10,7 +13,7 @@ class ProductModalContent extends LitElement {
   rendered = false;
 
   @property({ type: Object, attribute: 'data-product' })
-  product?: Record<string, unknown>;
+  product?: ProductJSON;
 
   @property({ type: String, attribute: 'data-handle' })
   handle?: string;
@@ -19,53 +22,53 @@ class ProductModalContent extends LitElement {
     if (this.rendered) {
       return;
     }
-
-    this.hydrate();
   }
 
-  async hydrate() {
+  async connectedCallback() {
+    super.connectedCallback();
+  }
+
+  renderImage (product: ProductJSON) : TemplateResult | typeof nothing {
+    return html`
+      <img
+        src="${ product.featured_image }"
+        class="_product_image_skelly"
+        onload="(el => { el.classList.add('_loaded'); })(this)">
+    `;
+  }
+
+  renderTitle (product: ProductJSON) : TemplateResult | typeof nothing {
+    return html`
+      <a href="${ product.url }">${ product.title }</a>
+    `;
+  }
+
+  renderProductPrice (variant: VariantJSON) : TemplateResult | typeof nothing {
+    return html`
+      <product-price .variant=${ variant }></product-price>
+    `;
+  }
+
+  renderBuyButton (variant: VariantJSON) : TemplateResult | typeof nothing {
+    return html`
+      <buy-button data-id="${ variant.id }"></buy-button>
+    `;
+  }
+
+  render() : TemplateResult | typeof nothing {
 
     if (!this.product) {
-      if (!this.handle) {
-        console.error('productModalContent', 'No product or handle provided');
-        return;
-      }
-
-      const productResponse = await customFetch(`/products/${ this.handle }.json`, {
-        method: 'get',
-      });
-
-      this.product = productResponse?.result?.product;
+      return nothing;
     }
 
-    if (!this.product) {
-      console.error('productModalContent', 'Unable to fetch product');
-      return;
-    }
-
-    const {
-      title,
-      url,
-      featured_image: featuredImageSrc,
-      variants,
-    } = this.product;
-
-    const variantList = variants as Array<{ available?: boolean; id: string | number }> | undefined;
+    const variantList = this.product.variants as Array<{ available?: boolean; id: string | number }> | undefined;
     const selectedOrFirstAvailableVariant = variantList?.find((v) => v.available) || variantList?.[0];
 
-    if (!selectedOrFirstAvailableVariant?.id) {
-      console.error('productModalContent', 'No variant for product');
-      return;
-    }
-
-    this.innerHTML = `
-      <img 
-        src="${ featuredImageSrc }" 
-        class="_product_image_skelly"
-        onload="(el => { el.classList.add('_loaded'); })(this)"
-      ">
-      <a href="${ url }">${ title }</a>
-      <buy-button data-id="${ selectedOrFirstAvailableVariant.id }"></buy-button>
+    return html`
+      ${ this.renderImage(this.product as ProductJSON) }
+      ${ this.renderTitle(this.product as ProductJSON) }
+      ${ this.renderProductPrice(selectedOrFirstAvailableVariant as VariantJSON) }
+      ${ this.renderBuyButton(selectedOrFirstAvailableVariant as VariantJSON) }
     `;
   }
 }
