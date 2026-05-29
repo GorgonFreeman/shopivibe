@@ -83,9 +83,14 @@ const liquidEscape = (value: unknown) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
+const formatPrice = (price?: number) => {
+  return price ? `${ (price / 100) }` : '';
+};
+
 export {
   wait,
   customFetch,
   t,
   liquidEscape,
+  formatPrice,
 };
