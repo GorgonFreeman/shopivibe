@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {%- capture captive_content_for_header -%}{{ content_for_header }}{%- endcapture -%}
     <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
+    {{ content_for_header }}
   </head>
   <body>
     {% sections 'header_group' %}
