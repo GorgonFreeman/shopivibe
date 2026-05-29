@@ -9,7 +9,7 @@
   data-id="{{ variant.id }}"
 >
   {% if compare_at_price %}
-    <s>{{ compare_at_price | money }} {{ shop.currency }}</s>
+    <s>{{ compare_at_price | money }}</s>
   {% endif %}
   <span>{{ current_price | money }} {{ shop.currency }}</span>
 </product-price>
