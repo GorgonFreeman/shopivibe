@@ -32,7 +32,14 @@ img._product_image_skelly._loaded {
 }
 
 product-modal-content {
-  display: block;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: left;
+  width: 80vw;
+  height: 80vh;
+}
+
+product-modal-content img {
   max-width: 300px;
 }
 
@@ -40,6 +47,9 @@ buy-button {
   margin: 0 auto;
 }
 
+product-modal-content buy-button {
+  margin: 0;
+}
 /* 
 collection-products product-tile {
   --animation_delay_increment: 20ms;
