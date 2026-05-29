@@ -3,6 +3,7 @@ import { LitElement } from 'lit';
 import { TemplateResult } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { VariantJSON } from './types/types';
+import { formatPrice } from './utils';
 
 class ProductPrice extends LitElement {
   createRenderRoot() { return this; }
@@ -25,10 +26,10 @@ class ProductPrice extends LitElement {
     return html`
       ${ this.variant.compare_at_price && this.variant.compare_at_price > this.variant.price
         ? html`
-          <s>${ this.variant.compare_at_price }</s>`
+          <s>${ formatPrice(this.variant.compare_at_price) }</s>`
         : nothing
       }
-      <span>${ this.variant.price } ${ currency }</span>`
+      <span>${ formatPrice(this.variant.price) } ${ currency }</span>`
     };
 }
 
