@@ -3,6 +3,7 @@ import { LitElement, TemplateResult } from 'lit';
 import { property } from 'lit/decorators.js';
 import { customFetch } from './utils';
 import './snippets_BuyButton';
+import './snippets_BuyButtonV2';
 import './snippets_ProductPrice';
 import { ProductJSON, VariantJSON } from './types/types';
 
@@ -51,7 +52,7 @@ class ProductModalContent extends LitElement {
 
   renderBuyButton (variant: VariantJSON) : TemplateResult | typeof nothing {
     return html`
-      <buy-button data-id="${ variant.id }"></buy-button>
+      <buy-button-v2 data-id="${ variant.id }"></buy-button-v2>
     `;
   }
 
