@@ -10,9 +10,6 @@ class BuyButtonV2 extends LitElement {
   @property({ type: Boolean, attribute: 'data-rendered' })
   rendered = false;
 
-  @property({ type: Object, attribute: 'data-variant' })
-  variant?: VariantJSON;
-
   @property({ type: String, attribute: 'data-id' })
   variantId?: string;
 
