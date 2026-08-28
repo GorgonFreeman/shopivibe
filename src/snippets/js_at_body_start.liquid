@@ -4,9 +4,3 @@
   render 'js_load_shopify_features'
   render 'js_geolocate'
 %}
-
-<script>
-  eventKeeper.onEventHeard('geolocation:ready', e => {
-    alert(JSON.stringify(e));
-  });
-</script>
