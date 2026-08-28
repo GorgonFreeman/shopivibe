@@ -1,0 +1,9 @@
+<script>
+  (async () => {
+    // TODO: Error handling
+    await window.Shopify.loadFeatures([
+      { name: 'consent-tracking-api', version: '0.1' },
+    ]);
+    document.dispatchEvent(new CustomEvent('shopify:features:ready'));
+  })();
+</script>

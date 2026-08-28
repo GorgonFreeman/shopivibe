@@ -21,7 +21,7 @@
     }
 
     heard(eventName) {
-      return this.history[eventName] || null;
+      return Object.prototype.hasOwnProperty.call(this.history, eventName);
     }
 
     onEventHeard(eventName, callback) {
@@ -35,7 +35,9 @@
       }, { once: true });
     }
   }
-
+  
   window.eventKeeper = new EventKeeper([
+    'shopify:features:ready',
   ]);
+  console.log('eventKeeper is here');
 </script>

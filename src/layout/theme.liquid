@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {%- capture captive_content_for_header -%}{{ content_for_header }}{%- endcapture -%}
+    {{ captive_content_for_header }}
     <link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
   </head>
   <body>
@@ -13,7 +14,7 @@
     {% render 'custom_modal', id: 'exampleModal', content: 'Holy smokes!' %}
     <button onclick="document.getElementById('exampleModal').showModal()">Open Modal</button>
     {% render 'lit_example' %}
-    
+
     {{ content_for_layout }}
 
     {% render 'js_at_body_end' %}

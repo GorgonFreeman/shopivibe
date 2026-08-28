@@ -1,0 +1,10 @@
+<script>
+  window.eventKeeper.onEventHeard('shopify:features:ready', () => {
+    const region = window.Shopify.customerPrivacy.getRegion();
+    document.dispatchEvent(new CustomEvent('geolocation:ready', {
+      detail: { 
+
+      },
+    }));
+  });
+</script>
