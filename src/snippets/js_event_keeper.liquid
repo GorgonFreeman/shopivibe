@@ -1,0 +1,41 @@
+<script>
+  class EventKeeper {
+    constructor(eventNames) {
+      for (const eventName of eventNames) {
+        this.listen(eventName);
+      }
+
+      this.history = {};
+    }
+
+    listen(eventName) {
+      document.addEventListener(eventName, e => {
+        this.hear(e);
+      });
+    }
+
+    hear(e) {
+      console.log('keeper heard', e);
+      const { type, detail } = e;
+      this.history[type] = detail;
+    }
+
+    heard(eventName) {
+      return this.history[eventName] || null;
+    }
+
+    onEventHeard(eventName, callback) {
+      if (this.heard(eventName)) {
+        return callback(this.history[eventName]);
+      }
+
+      document.addEventListener(eventName, e => {
+        const { detail } = e;
+        callback(detail);
+      }, { once: true });
+    }
+  }
+
+  window.eventKeeper = new EventKeeper([
+  ]);
+</script>
