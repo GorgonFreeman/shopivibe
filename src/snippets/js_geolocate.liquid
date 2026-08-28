@@ -1,7 +1,8 @@
 <script>
-  window.eventKeeper.onEventHeard('shopify:features:ready', () => {
+  window.eventKeeper.onEventHeard('shopify:features:consent-tracking-api:ready', () => {
 
-    const region = window.Shopify.customerPrivacy.getRegion();
+    const region = window?.Shopify?.customerPrivacy?.getRegion();
+
     if (!region) {
       return;
     }

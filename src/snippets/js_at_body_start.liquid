@@ -5,3 +5,8 @@
   render 'js_geolocate'
 %}
 
+<script>
+  eventKeeper.onEventHeard('geolocation:ready', e => {
+    alert(JSON.stringify(e));
+  });
+</script>
