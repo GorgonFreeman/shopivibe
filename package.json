@@ -18,6 +18,8 @@
     "b": "npm run build",
     "watch": "node scripts/watch.js",
     "w": "npm run watch",
+    "dev": "npm run watch",
+    "start": "npm run watch",
     "deploy": "node scripts/deploy.js",
     "dep": "npm run deploy",
     "upload": "node scripts/upload.js",
