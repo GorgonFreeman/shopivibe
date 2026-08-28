@@ -1,0 +1,51 @@
+<script>
+  
+  const stores = [
+    {
+      url: 'whitefoxboutique.com.au',
+      countryCodes: [
+        'AU',
+      ],
+    },
+    {
+      url: 'whitefoxboutique.ca',
+      countryCodes: [
+        'CA',
+      ],
+    },
+    {
+      url: 'whitefoxboutique.com',
+      countryCodes: [
+        'US',
+      ],
+    },
+    {
+      url: 'whitefoxboutique.co.uk',
+      countryCodes: [
+        'GB',
+      ],
+    },
+  ];
+
+  const defaultStore = stores[0];
+
+  const storeByCountryCode = (countryCode) => {
+    return stores.find(({ countryCodes }) => countryCodes.includes(countryCode)) || defaultStore;
+  };
+
+  eventKeeper.onEventHeard('geolocation:ready', ({ countryCode, provinceCode }) => {
+
+    const inferredStore = storeByCountryCode(countryCode);
+    const currentStoreUrl = window.location.hostname;
+    console.log({ currentStoreUrl, inferredStore });
+
+    if (currentStoreUrl === inferredStore.url) {
+      console.log(`georedirect: I'm right where I'm supposed to be`);
+      return;
+    }
+
+    console.log(`georedirect: You're on ${ currentStoreUrl } but you should be on ${ inferredStore.url }`);
+
+    // TODO: Currency logic
+  });
+</script>
