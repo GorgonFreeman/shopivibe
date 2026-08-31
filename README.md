@@ -132,3 +132,15 @@ Included in layout via `{% render 'js_translations' %}`.
 ## Credentials
 
 Copy `.creds.yml.sample` to `.creds.yml` and fill in store details. Each store needs `STORE_URL` and optionally `SHOPIFY_API_KEY`.
+
+## The Theme
+
+### Events
+A util called "event keeper" streamlines the actioning of events during load, so you don't have to know if it's already fired or not.
+
+Use `window.eventKeeper.onHeardEvent()` to listen for an event, and add it to the `event_keeper` snippet's list of events. If the event has fired already, it'll action the callback immediately. 
+
+### Geolocation
+The theme uses `window.Shopify.loadFeatures` > `'consent-tracking-api'`, then `window.Shopify.customerPrivacy.getRegion()` to get the user's country code. This is then announced with a document event `geolocation:ready`.
+
+An example of something that uses this info is the georedirect, which will offer UI that nudges the user towards the Shopify store that serves their location.
